@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SecureAudit RAG v2 — AI-Powered Security Audit Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080c14;--bg2:#0d1220;--bg3:#111827;--bg4:#161f30;--surface:#1a2540;--surface2:#202d4a;
+  --border:rgba(255,255,255,0.06);--border2:rgba(255,255,255,0.11);--border3:rgba(255,255,255,0.18);
+  --text:#e2e8f5;--text2:#8b9dc3;--text3:#4d5e80;--text4:#2d3a55;
+  --blue:#3b82f6;--blue2:#60a5fa;--blue3:#93c5fd;
+  --teal:#0d9488;--teal2:#14b8a6;--teal3:#2dd4bf;
+  --amber:#d97706;--amber2:#f59e0b;--amber3:#fcd34d;
+  --red:#dc2626;--red2:#ef4444;--red3:#f87171;
+  --green:#16a34a;--green2:#22c55e;--green3:#4ade80;
+  --purple:#7c3aed;--purple2:#a78bfa;--purple3:#c4b5fd;
+  --pink:#db2777;--pink2:#ec4899;--pink3:#f9a8d4;
+  --font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r4:4px;--r6:6px;--r8:8px;--r10:10px;--r12:12px;--r16:16px;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;line-height:1.5;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* ── TOPBAR ── */
+.topbar{position:sticky;top:0;z-index:200;background:var(--bg2);border-bottom:1px solid var(--border);height:56px;display:flex;align-items:center;padding:0 20px;gap:12px}
+.logo-wrap{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.logo-icon{width:30px;height:30px;background:linear-gradient(135deg,var(--blue),var(--teal2));border-radius:7px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:16px;height:16px;fill:white}
+.logo-name{font-size:15px;font-weight:700;letter-spacing:-0.4px}
+.logo-name em{color:var(--teal3);font-style:normal}
+.rag-chip{background:rgba(13,148,136,0.1);border:1px solid rgba(13,148,136,0.25);color:var(--teal3);padding:2px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:var(--mono);letter-spacing:.5px;flex-shrink:0}
+.topbar-mid{flex:1;display:flex;align-items:center;gap:10px;max-width:340px;margin-left:16px}
+.top-search{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r8);padding:6px 12px 6px 32px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s}
+.top-search:focus{border-color:var(--blue)}
+.top-search::placeholder{color:var(--text3)}
+.search-wrap{position:relative;flex:1}
+.search-wrap::before{content:'⌕';position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;pointer-events:none}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.topbar-btn{background:none;border:none;cursor:pointer;width:34px;height:34px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;color:var(--text2);transition:background .2s;position:relative}
+.topbar-btn:hover{background:var(--surface)}
+.notif-dot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--red2);border-radius:50%;border:2px solid var(--bg2)}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 12px 4px 4px;cursor:pointer;transition:border-color .2s}
+.user-pill:hover{border-color:var(--border2)}
+.user-av{width:26px;height:26px;background:linear-gradient(135deg,var(--blue),var(--purple2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:white}
+.user-role{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* ── NOTIF DROPDOWN ── */
+.notif-panel{position:absolute;top:52px;right:60px;width:340px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r12);overflow:hidden;display:none;z-index:300;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.notif-panel.open{display:block}
+.notif-head{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.notif-head span{font-size:13px;font-weight:600}
+.notif-clear{font-size:11px;color:var(--blue2);cursor:pointer;background:none;border:none;font-family:var(--font)}
+.notif-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;cursor:pointer;transition:background .15s}
+.notif-item:hover{background:var(--surface)}
+.notif-item:last-child{border-bottom:none}
+.ni-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.ni-title{font-size:12px;font-weight:500;margin-bottom:2px}
+.ni-sub{font-size:11px;color:var(--text3)}
+.ni-time{font-size:10px;color:var(--text3);font-family:var(--mono);margin-left:auto;flex-shrink:0}
+
+/* ── SIDEBAR ── */
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:220px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);padding:12px 8px;display:flex;flex-direction:column;gap:4px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto}
+.sidebar-section{font-size:10px;font-family:var(--mono);color:var(--text4);text-transform:uppercase;letter-spacing:1px;padding:8px 8px 4px;margin-top:4px}
+.nav-btn{width:100%;border:none;background:none;padding:8px 10px;border-radius:var(--r8);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:8px;text-align:left;transition:all .15s;position:relative}
+.nav-btn:hover{background:var(--surface);color:var(--text)}
+.nav-btn.active{background:rgba(59,130,246,0.1);color:var(--blue2)}
+.nav-btn.active::before{content:'';position:absolute;left:0;top:6px;bottom:6px;width:2.5px;background:var(--blue2);border-radius:2px}
+.nav-icon{font-size:14px;opacity:.7;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:white;font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:10px;font-weight:600}
+.nav-badge.amber{background:var(--amber)}
+.nav-badge.blue{background:var(--blue)}
+.sidebar-footer{margin-top:auto;padding:12px 8px;border-top:1px solid var(--border)}
+.system-status{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3)}
+.status-online{width:6px;height:6px;background:var(--green2);border-radius:50%;box-shadow:0 0 5px var(--green2)}
+
+/* ── MAIN ── */
+.main{flex:1;padding:24px;overflow-y:auto;min-width:0}
+.section{display:none;animation:fadeIn .2s ease}
+.section.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(3px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── TYPOGRAPHY ── */
+.page-title{font-size:20px;font-weight:700;letter-spacing:-.4px}
+.page-sub{font-size:12px;color:var(--text2);margin-top:3px}
+.sec-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px;gap:12px}
+.section-label{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+
+/* ── CARDS ── */
+.card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:18px}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r10);padding:14px}
+.card-xs{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);padding:12px}
+
+/* ── STAT CARDS ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r10);padding:16px;position:relative;overflow:hidden;cursor:default}
+.stat-top{height:2px;position:absolute;top:0;left:0;right:0;border-radius:var(--r4) var(--r4) 0 0}
+.stat-label{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.stat-val{font-size:26px;font-weight:700;line-height:1;letter-spacing:-1px}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:5px}
+.stat-trend{font-size:10px;font-family:var(--mono);margin-top:4px}
+.trend-up{color:var(--green3)}
+.trend-down{color:var(--red3)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:10px;font-weight:600;font-family:var(--mono);white-space:nowrap}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.b-green{background:rgba(34,197,94,.1);color:var(--green3);border:1px solid rgba(34,197,94,.18)}
+.b-green::before{background:var(--green2)}
+.b-amber{background:rgba(245,158,11,.1);color:var(--amber3);border:1px solid rgba(245,158,11,.18)}
+.b-amber::before{background:var(--amber2)}
+.b-red{background:rgba(239,68,68,.1);color:var(--red3);border:1px solid rgba(239,68,68,.18)}
+.b-red::before{background:var(--red2)}
+.b-blue{background:rgba(59,130,246,.1);color:var(--blue3);border:1px solid rgba(59,130,246,.18)}
+.b-blue::before{background:var(--blue)}
+.b-teal{background:rgba(13,148,136,.1);color:var(--teal3);border:1px solid rgba(13,148,136,.18)}
+.b-teal::before{background:var(--teal2)}
+.b-gray{background:rgba(255,255,255,.05);color:var(--text3);border:1px solid var(--border)}
+.b-gray::before{background:var(--text3)}
+.b-purple{background:rgba(124,58,237,.1);color:var(--purple3);border:1px solid rgba(124,58,237,.18)}
+.b-purple::before{background:var(--purple2)}
+
+/* ── PROGRESS ── */
+.progress-wrap{margin:10px 0}
+.progress-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:5px}
+.progress-bar{height:4px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.pf{height:100%;border-radius:4px;transition:width .6s ease}
+.pf-blue{background:var(--blue)}
+.pf-teal{background:var(--teal2)}
+.pf-amber{background:var(--amber2)}
+.pf-green{background:var(--green2)}
+.pf-red{background:var(--red2)}
+.pf-purple{background:var(--purple2)}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:800px){.g2,.g3,.g4{grid-template-columns:1fr}.sidebar{display:none}.stat-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:9px 12px;color:var(--text3);font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.015)}
+
+/* ── FILTERS ── */
+.filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.fb{padding:4px 12px;border-radius:20px;border:1px solid var(--border);background:none;color:var(--text2);font-family:var(--font);font-size:11px;cursor:pointer;transition:all .15s}
+.fb:hover{border-color:var(--border2);color:var(--text)}
+.fb.active{background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.3);color:var(--blue2)}
+
+/* ── RAG UPLOAD ZONE ── */
+.upload-zone{border:1.5px dashed var(--border2);border-radius:var(--r12);padding:28px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(59,130,246,.02)}
+.upload-zone:hover{border-color:var(--blue);background:rgba(59,130,246,.04)}
+.upload-zone.dragover{border-color:var(--teal2);background:rgba(13,148,136,.05)}
+.uz-icon{font-size:28px;margin-bottom:8px}
+.uz-main{font-size:13px;color:var(--text2);margin-bottom:3px}
+.uz-main strong{color:var(--blue2)}
+.uz-sub{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* ── PIPELINE STEPS ── */
+.pipeline{display:flex;align-items:center;gap:0;margin:16px 0}
+.pipe-step{flex:1;text-align:center;position:relative}
+.pipe-step:not(:last-child)::after{content:'';position:absolute;top:14px;left:60%;right:-40%;height:1px;background:var(--border2)}
+.pipe-step.done::after{background:var(--teal2)}
+.ps-dot{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:11px;margin:0 auto 6px;background:var(--bg4);transition:all .3s}
+.pipe-step.done .ps-dot{background:rgba(13,148,136,.15);border-color:var(--teal2);color:var(--teal3)}
+.pipe-step.active .ps-dot{background:rgba(59,130,246,.15);border-color:var(--blue2);color:var(--blue2);animation:pulse 1.5s ease-in-out infinite}
+.pipe-step.error .ps-dot{background:rgba(239,68,68,.15);border-color:var(--red2);color:var(--red3)}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(59,130,246,.3)}50%{box-shadow:0 0 0 5px rgba(59,130,246,.0)}}
+.ps-label{font-size:10px;color:var(--text3);font-family:var(--mono)}
+
+/* ── AI ANSWER CARD ── */
+.rag-answer{background:rgba(59,130,246,.04);border:1px solid rgba(59,130,246,.15);border-radius:var(--r10);padding:14px;margin-top:10px}
+.rag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.rag-tag{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-family:var(--mono);color:var(--blue2);background:rgba(59,130,246,.1);padding:2px 8px;border-radius:4px}
+.confidence-bar{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text2)}
+.conf-track{width:80px;height:4px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.conf-fill{height:100%;border-radius:4px;transition:width .5s}
+.rag-text{font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:10px}
+.rag-sources{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.src-pill{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-family:var(--mono);padding:2px 8px;border-radius:4px;background:var(--bg4);border:1px solid var(--border);color:var(--text2);cursor:pointer;transition:all .15s}
+.src-pill:hover{border-color:var(--border2);color:var(--text)}
+.src-pill.web{background:rgba(13,148,136,.07);border-color:rgba(13,148,136,.2);color:var(--teal3)}
+.rag-actions{display:flex;gap:6px}
+.act-btn{padding:5px 12px;border-radius:var(--r6);font-size:11px;font-family:var(--font);font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--border2);background:none;color:var(--text2)}
+.act-btn:hover{background:var(--surface);color:var(--text)}
+.act-btn.approve{background:rgba(34,197,94,.1);border-color:rgba(34,197,94,.2);color:var(--green3)}
+.act-btn.approve:hover{background:rgba(34,197,94,.18)}
+.act-btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+.act-btn.primary:hover{background:#2563eb}
+
+/* ── QUESTION ROWS ── */
+.q-item{display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);transition:border-color .15s}
+.q-item:hover{border-color:var(--border2)}
+.q-num{font-family:var(--mono);font-size:10px;color:var(--text3);flex-shrink:0;padding-top:1px;min-width:28px}
+.q-body{flex:1;min-width:0}
+.q-text{font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.5}
+.q-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+
+/* ── LENDER CARDS ── */
+.lender-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:20px;transition:border-color .2s}
+.lender-card:hover{border-color:var(--border2)}
+.lender-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.lender-av{width:40px;height:40px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:var(--mono);flex-shrink:0}
+.av-hdfc{background:rgba(220,38,38,.12);color:#f87171;border:1px solid rgba(220,38,38,.2)}
+.av-idfc{background:rgba(59,130,246,.12);color:#93c5fd;border:1px solid rgba(59,130,246,.2)}
+.av-cashify{background:rgba(217,119,6,.12);color:#fcd34d;border:1px solid rgba(217,119,6,.2)}
+.av-icici{background:rgba(22,163,74,.12);color:#86efac;border:1px solid rgba(22,163,74,.2)}
+.lender-name{font-size:14px;font-weight:600}
+.lender-type{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-family:var(--mono)}
+.chip-green{background:rgba(34,197,94,.08);color:var(--green3)}
+.chip-amber{background:rgba(245,158,11,.08);color:var(--amber3)}
+.chip-red{background:rgba(239,68,68,.08);color:var(--red3)}
+.chip-blue{background:rgba(59,130,246,.08);color:var(--blue3)}
+.chip-purple{background:rgba(124,58,237,.08);color:var(--purple3)}
+
+/* ── ANSWER EDITOR ── */
+.answer-editor{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);overflow:hidden;margin-top:8px;display:none}
+.answer-editor.open{display:block}
+.ae-toolbar{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px;background:var(--bg3)}
+.ae-tool{width:24px;height:24px;border-radius:4px;border:none;background:none;cursor:pointer;color:var(--text2);font-size:12px;transition:background .15s}
+.ae-tool:hover{background:var(--surface)}
+.ae-divider{width:1px;height:16px;background:var(--border);margin:0 2px}
+textarea.ae-input{width:100%;background:var(--bg4);border:none;padding:12px;color:var(--text);font-family:var(--font);font-size:12px;resize:vertical;min-height:80px;outline:none;line-height:1.6}
+.ae-footer{padding:8px 12px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:6px;background:var(--bg3)}
+
+/* ── PCI ── */
+.pci-domain{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r10);padding:14px}
+.pci-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.pci-num{font-size:10px;font-family:var(--mono);color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:4px;border:1px solid var(--border)}
+.pci-title{font-size:12px;font-weight:500;margin:6px 0 8px}
+.ctrl-pills{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.ctrl{font-size:9px;font-family:var(--mono);padding:2px 7px;border-radius:3px;border:1px solid var(--border)}
+.ctrl.done{background:rgba(34,197,94,.07);color:var(--green3);border-color:rgba(34,197,94,.15)}
+.ctrl.partial{background:rgba(245,158,11,.07);color:var(--amber3);border-color:rgba(245,158,11,.15)}
+.ctrl.todo{background:rgba(239,68,68,.07);color:var(--red3);border-color:rgba(239,68,68,.15)}
+
+/* ── ANALYTICS ── */
+.chart-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:18px}
+.chart-title{font-size:13px;font-weight:600;margin-bottom:4px}
+.chart-sub{font-size:11px;color:var(--text3);margin-bottom:14px}
+.chart-wrap{position:relative;height:200px}
+
+/* ── HEATMAP ── */
+.heatmap-grid{display:grid;gap:3px}
+.hm-cell{border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);cursor:pointer;transition:opacity .15s}
+.hm-cell:hover{opacity:.8}
+
+/* ── RISK TABLE ── */
+.risk-row td:first-child{font-weight:500}
+.risk-score{display:inline-flex;align-items:center;gap:6px}
+.risk-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ── AUDIT TRAIL ── */
+.trail-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.trail-item:last-child{border-bottom:none}
+.trail-icon{width:30px;height:30px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.trail-body{flex:1;min-width:0}
+.trail-title{font-size:12px;font-weight:500;margin-bottom:2px}
+.trail-meta{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.trail-hash{font-size:9px;color:var(--text4);font-family:var(--mono);margin-top:3px}
+
+/* ── NOTIFICATIONS ── */
+.notif-row{display:flex;align-items:flex-start;gap:10px;padding:12px;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);transition:border-color .15s}
+.notif-row:hover{border-color:var(--border2)}
+.nr-icon{width:32px;height:32px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nr-body{flex:1}
+.nr-title{font-size:12px;font-weight:500;margin-bottom:2px}
+.nr-sub{font-size:11px;color:var(--text3)}
+.nr-time{font-size:10px;font-family:var(--mono);color:var(--text3);white-space:nowrap}
+.nr-actions{display:flex;gap:5px;margin-top:6px}
+
+/* ── TRAINING ── */
+.training-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r12);padding:20px}
+.tc-icon{width:42px;height:42px;border-radius:var(--r10);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:12px}
+.tc-icon.blue{background:rgba(59,130,246,.1)}
+.tc-icon.purple{background:rgba(124,58,237,.1)}
+
+/* ── DOC GRID ── */
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px}
+.doc-card{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r10);padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;transition:border-color .15s}
+.doc-card:hover{border-color:var(--border2)}
+.doc-icon{width:34px;height:34px;border-radius:var(--r8);display:flex;align-items:center;justify-content:center;font-size:15px;background:var(--bg3);flex-shrink:0}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-size:11px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-due{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.doc-version{font-size:9px;color:var(--text4);font-family:var(--mono)}
+
+/* ── ACCORDION ── */
+.acc-item{border:1px solid var(--border);border-radius:var(--r10);overflow:hidden;margin-bottom:8px}
+.acc-head{padding:14px 16px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--bg3);user-select:none;transition:background .15s}
+.acc-head:hover{background:var(--bg4)}
+.acc-head.open{background:var(--bg4)}
+.acc-left{display:flex;align-items:center;gap:10px}
+.acc-title{font-size:13px;font-weight:500}
+.acc-chev{color:var(--text3);font-size:11px;transition:transform .2s}
+.acc-head.open .acc-chev{transform:rotate(180deg)}
+.acc-body{display:none;padding:16px;background:var(--bg4);border-top:1px solid var(--border)}
+.acc-body.open{display:block}
+
+/* ── RBAC USERS ── */
+.user-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.user-row:last-child{border-bottom:none}
+.u-av{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.u-info{flex:1}
+.u-name{font-size:12px;font-weight:500}
+.u-email{font-size:10px;color:var(--text3);font-family:var(--mono)}
+.role-select{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r6);padding:3px 8px;color:var(--text);font-family:var(--mono);font-size:10px;cursor:pointer}
+
+/* ── DIVIDER ── */
+hr{border:none;border-top:1px solid var(--border);margin:16px 0}
+
+/* ── SCROLLABLE ── */
+.scroll-x{overflow-x:auto;scrollbar-width:thin}
+
+/* ── METRIC MINI ── */
+.mini-metric{background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);padding:12px 14px}
+.mm-label{font-size:10px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;margin-bottom:4px}
+.mm-val{font-size:20px;font-weight:700;line-height:1}
+
+/* ── TIMELINE ── */
+.tl-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.tl-item:last-child{border-bottom:none}
+.tl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:4px}
+.tl-body{flex:1}
+.tl-title{font-size:12px;font-weight:500}
+.tl-meta{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:1px}
+
+/* ── EXPORT BTN ── */
+.export-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:var(--r8);font-size:11px;font-weight:500;cursor:pointer;transition:all .15s;border:1px solid var(--border2);background:none;color:var(--text2);font-family:var(--font)}
+.export-btn:hover{background:var(--surface);color:var(--text);border-color:var(--border3)}
+.export-btn.primary{background:var(--blue);border-color:var(--blue);color:white}
+.export-btn.primary:hover{background:#2563eb}
+
+/* ── TABS (inner) ── */
+.inner-tabs{display:flex;gap:0;border-bottom:1px solid var(--border);margin-bottom:16px}
+.itab{padding:8px 14px;font-size:12px;font-weight:500;color:var(--text2);cursor:pointer;border:none;background:none;font-family:var(--font);border-bottom:2px solid transparent;transition:all .15s}
+.itab:hover{color:var(--text)}
+.itab.active{color:var(--blue2);border-bottom-color:var(--blue2)}
+.itab-panel{display:none}
+.itab-panel.active{display:block}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-bg.open{display:flex}
+.modal{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r16);padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto}
+.modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.modal-title{font-size:15px;font-weight:600}
+.modal-close{width:28px;height:28px;border-radius:var(--r6);border:none;background:none;color:var(--text2);cursor:pointer;font-size:18px;transition:background .15s;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--surface)}
+.form-field{margin-bottom:14px}
+.form-label{font-size:11px;font-family:var(--mono);color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:block}
+.form-input{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);padding:8px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;transition:border-color .2s}
+.form-input:focus{border-color:var(--blue)}
+.form-select{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);padding:8px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer}
+
+/* ── SECURITY SCORE RING ── */
+.score-ring{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
+canvas.ring-canvas{display:block}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo-wrap">
+    <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5L12 1z"/></svg></div>
+    <span class="logo-name">Secure<em>Audit</em> RAG</span>
+    <span class="rag-chip">AI v2</span>
+  </div>
+  <div class="topbar-mid">
+    <div class="search-wrap"><input class="top-search" type="text" placeholder="Search questions, documents, audits..." id="globalSearch"></div>
+  </div>
+  <div class="topbar-right">
+    <button class="topbar-btn" onclick="toggleNotif()" title="Notifications">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="notif-dot"></span>
+    </button>
+    <button class="topbar-btn" onclick="openModal('settingsModal')" title="Settings">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
+    <div class="user-pill">
+      <div class="user-av">AK</div>
+      <div><div style="font-size:12px;font-weight:500">Arjun K.</div><div class="user-role">CISO</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NOTIFICATION PANEL -->
+<div class="notif-panel" id="notifPanel">
+  <div class="notif-head"><span>Notifications</span><button class="notif-clear" onclick="clearNotifs()">Mark all read</button></div>
+  <div class="notif-item"><div class="ni-dot" style="background:var(--red2)"></div><div class="ni-body"><div class="ni-title">BCP Document overdue</div><div class="ni-sub">30 days past deadline — IDFC audit at risk</div></div><div class="ni-time">2h</div></div>
+  <div class="notif-item"><div class="ni-dot" style="background:var(--amber2)"></div><div class="ni-body"><div class="ni-title">ICICI questionnaire extracted</div><div class="ni-sub">97 questions ready for AI processing</div></div><div class="ni-time">5h</div></div>
+  <div class="notif-item"><div class="ni-dot" style="background:var(--blue2)"></div><div class="ni-body"><div class="ni-title">PCI DSS REQ-11 action required</div><div class="ni-sub">6 controls non-compliant — 21 days to deadline</div></div><div class="ni-time">1d</div></div>
+  <div class="notif-item"><div class="ni-dot" style="background:var(--green2)"></div><div class="ni-body"><div class="ni-title">HDFC Audit — 12 answers approved</div><div class="ni-sub">Compliance score improved to 82%</div></div><div class="ni-time">2d</div></div>
+  <div class="notif-item"><div class="ni-dot" style="background:var(--purple2)"></div><div class="ni-body"><div class="ni-title">Security awareness training</div><div class="ni-sub">Finance dept completion still at 18%</div></div><div class="ni-time">3d</div></div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-section">Overview</div>
+  <button class="nav-btn active" onclick="nav('dashboard',this)"><span class="nav-icon">◧</span>Dashboard</button>
+  <button class="nav-btn" onclick="nav('analytics',this)"><span class="nav-icon">📊</span>Analytics</button>
+  <button class="nav-btn" onclick="nav('notifications',this)"><span class="nav-icon">🔔</span>Notifications<span class="nav-badge">5</span></button>
+
+  <div class="sidebar-section">Audits</div>
+  <button class="nav-btn" onclick="nav('lender',this)"><span class="nav-icon">🏦</span>Lender Audits<span class="nav-badge amber">2</span></button>
+  <button class="nav-btn" onclick="nav('pci',this)"><span class="nav-icon">🔐</span>PCI DSS</button>
+
+  <div class="sidebar-section">Compliance</div>
+  <button class="nav-btn" onclick="nav('training',this)"><span class="nav-icon">🎓</span>Training</button>
+  <button class="nav-btn" onclick="nav('internal',this)"><span class="nav-icon">📋</span>Internal Assessment<span class="nav-badge">1</span></button>
+  <button class="nav-btn" onclick="nav('documents',this)"><span class="nav-icon">📁</span>Document Review</button>
+
+  <div class="sidebar-section">AI Engine</div>
+  <button class="nav-btn" onclick="nav('rag',this)"><span class="nav-icon">⚡</span>RAG Pipeline</button>
+  <button class="nav-btn" onclick="nav('trail',this)"><span class="nav-icon">📜</span>Audit Trail</button>
+
+  <div class="sidebar-section">Admin</div>
+  <button class="nav-btn" onclick="nav('rbac',this)"><span class="nav-icon">👥</span>Users & RBAC</button>
+
+  <div class="sidebar-footer">
+    <div class="system-status"><div class="status-online"></div>All systems operational</div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ===== DASHBOARD ===== -->
+<div class="section active" id="tab-dashboard">
+  <div class="sec-head">
+    <div><div class="page-title">Security Dashboard</div><div class="page-sub">Consolidated audit intelligence — FY 2024–25</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="export-btn" onclick="exportPDF()">⬇ Export Report</button>
+      <span class="badge b-blue">Live</span>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card"><div class="stat-top" style="background:var(--blue)"></div><div class="stat-label">Active Audits</div><div class="stat-val" style="color:var(--blue2)">5</div><div class="stat-sub">4 lenders + 1 PCI DSS</div><div class="stat-trend trend-up">↑ 2 new this quarter</div></div>
+    <div class="stat-card"><div class="stat-top" style="background:var(--green2)"></div><div class="stat-label">Avg Compliance</div><div class="stat-val" style="color:var(--green3)">77%</div><div class="stat-sub">Across all audits</div><div class="stat-trend trend-up">↑ 8% from last quarter</div></div>
+    <div class="stat-card"><div class="stat-top" style="background:var(--amber2)"></div><div class="stat-label">Pending Actions</div><div class="stat-val" style="color:var(--amber3)">23</div><div class="stat-sub">Require human review</div><div class="stat-trend trend-down">↑ 3 new since yesterday</div></div>
+    <div class="stat-card"><div class="stat-top" style="background:var(--red2)"></div><div class="stat-label">Critical Overdue</div><div class="stat-val" style="color:var(--red3)">4</div><div class="stat-sub">Escalated to CISO</div><div class="stat-trend trend-down">BCP + PCI REQ-11</div></div>
+  </div>
+
+  <div class="g2" style="margin-bottom:16px">
+    <!-- Compliance scores -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:13px;font-weight:600">Compliance Score by Audit</div><span class="badge b-blue">Q4 FY25</span></div>
+      <div style="display:grid;gap:10px">
+        <div><div class="progress-row"><span>HDFC — Vendor Security</span><span style="font-family:var(--mono)">82%</span></div><div class="progress-bar"><div class="pf pf-blue" style="width:82%"></div></div></div>
+        <div><div class="progress-row"><span>IDFC — Third Party Risk</span><span style="font-family:var(--mono)">71%</span></div><div class="progress-bar"><div class="pf pf-teal" style="width:71%"></div></div></div>
+        <div><div class="progress-row"><span>Cashify — SaaS Assessment</span><span style="font-family:var(--mono)">90%</span></div><div class="progress-bar"><div class="pf pf-green" style="width:90%"></div></div></div>
+        <div><div class="progress-row"><span>ICICI — InfoSec Audit</span><span style="font-family:var(--mono)">65%</span></div><div class="progress-bar"><div class="pf pf-amber" style="width:65%"></div></div></div>
+        <div><div class="progress-row"><span>PCI DSS v4.0</span><span style="font-family:var(--mono)">78%</span></div><div class="progress-bar"><div class="pf pf-red" style="width:78%"></div></div></div>
+      </div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:600;margin-bottom:12px">Recent Activity</div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--green2)"></div><div class="tl-body"><div class="tl-title">InfoSec Policy v3.2 — Approved</div><div class="tl-meta">HDFC Audit · Arjun K. · 2 hrs ago</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--blue)"></div><div class="tl-body"><div class="tl-title">RAG extracted 97 questions from ICICI PDF</div><div class="tl-meta">RAG Engine · Auto · 5 hrs ago</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--amber2)"></div><div class="tl-body"><div class="tl-title">SDLC Training — 8 engineers overdue</div><div class="tl-meta">Training Module · System · 6 hrs ago</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--red2)"></div><div class="tl-body"><div class="tl-title">BCP Document — Escalated to CISO</div><div class="tl-meta">Deadline Engine · Auto · 1 day ago</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--teal2)"></div><div class="tl-body"><div class="tl-title">VAPT Policy updated — v2.1</div><div class="tl-meta">Doc Review · Priya M. · 2 days ago</div></div></div>
+      <div class="tl-item"><div class="tl-dot" style="background:var(--purple2)"></div><div class="tl-body"><div class="tl-title">New user onboarded — Rohan Shah (Reviewer)</div><div class="tl-meta">RBAC · Arjun K. · 3 days ago</div></div></div>
+    </div>
+  </div>
+
+  <!-- Risk summary + RAG engine status -->
+  <div class="g3">
+    <div class="card-sm">
+      <div class="section-label">RAG Engine Status</div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span style="color:var(--text2)">Vector DB (pgvector)</span><span class="badge b-green">Online</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span style="color:var(--text2)">Embedding model</span><span class="badge b-green">Active</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span style="color:var(--text2)">LLM (Claude Sonnet)</span><span class="badge b-green">Active</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span style="color:var(--text2)">Web retrieval</span><span class="badge b-teal">Active</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span style="color:var(--text2)">Ingestion queue</span><span class="badge b-amber">97 pending</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:12px"><span style="color:var(--text2)">Documents indexed</span><span style="font-family:var(--mono);font-size:12px;color:var(--text)">1,284</span></div>
+      </div>
+    </div>
+    <div class="card-sm">
+      <div class="section-label">Deadline Alerts</div>
+      <div style="display:grid;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.12);border-radius:var(--r6)"><span style="font-size:11px;color:var(--red3)">BCP Document</span><span style="font-size:10px;font-family:var(--mono);color:var(--red3)">OD 30d</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.12);border-radius:var(--r6)"><span style="font-size:11px;color:var(--red3)">PCI REQ-11 Test</span><span style="font-size:10px;font-family:var(--mono);color:var(--red3)">OD 5d</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.12);border-radius:var(--r6)"><span style="font-size:11px;color:var(--amber3)">HDFC Submission</span><span style="font-size:10px;font-family:var(--mono);color:var(--amber3)">7 days</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.12);border-radius:var(--r6)"><span style="font-size:11px;color:var(--amber3)">Fin Training</span><span style="font-size:10px;font-family:var(--mono);color:var(--amber3)">12 days</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.12);border-radius:var(--r6)"><span style="font-size:11px;color:var(--blue3)">Patch Mgmt Policy</span><span style="font-size:10px;font-family:var(--mono);color:var(--blue3)">15 days</span></div>
+      </div>
+    </div>
+    <div class="card-sm">
+      <div class="section-label">AI Answer Stats</div>
+      <div style="display:grid;gap:8px">
+        <div><div class="progress-row"><span>Auto-approved (conf ≥90%)</span><span style="font-family:var(--mono)">38%</span></div><div class="progress-bar"><div class="pf pf-green" style="width:38%"></div></div></div>
+        <div><div class="progress-row"><span>Human reviewed + approved</span><span style="font-family:var(--mono)">44%</span></div><div class="progress-bar"><div class="pf pf-blue" style="width:44%"></div></div></div>
+        <div><div class="progress-row"><span>Human overridden</span><span style="font-family:var(--mono)">11%</span></div><div class="progress-bar"><div class="pf pf-amber" style="width:11%"></div></div></div>
+        <div><div class="progress-row"><span>Manual (no AI match)</span><span style="font-family:var(--mono)">7%</span></div><div class="progress-bar"><div class="pf pf-red" style="width:7%"></div></div></div>
+        <hr>
+        <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text3)">Avg confidence score</span><span style="font-family:var(--mono);color:var(--text)">86.4%</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--text3)">Avg time saved / question</span><span style="font-family:var(--mono);color:var(--green3)">~18 min</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ANALYTICS ===== -->
+<div class="section" id="tab-analytics">
+  <div class="sec-head">
+    <div><div class="page-title">Analytics & Reporting</div><div class="page-sub">Compliance trends, risk heatmap and export centre</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="export-btn" onclick="exportPDF()">⬇ PDF Report</button>
+      <button class="export-btn" onclick="exportXLSX()">⬇ XLSX Export</button>
+    </div>
+  </div>
+
+  <div class="g4" style="margin-bottom:20px">
+    <div class="mini-metric"><div class="mm-label">Compliance Trend</div><div class="mm-val" style="color:var(--green3)">+8%</div><div style="font-size:10px;color:var(--text3);margin-top:3px">vs last quarter</div></div>
+    <div class="mini-metric"><div class="mm-label">Docs Expiring 30d</div><div class="mm-val" style="color:var(--amber3)">9</div><div style="font-size:10px;color:var(--text3);margin-top:3px">review required</div></div>
+    <div class="mini-metric"><div class="mm-label">RAG Answer Reuse</div><div class="mm-val" style="color:var(--blue2)">73%</div><div style="font-size:10px;color:var(--text3);margin-top:3px">across lender audits</div></div>
+    <div class="mini-metric"><div class="mm-label">Open Risk Items</div><div class="mm-val" style="color:var(--red3)">17</div><div style="font-size:10px;color:var(--text3);margin-top:3px">across all audits</div></div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px">
+    <div class="chart-card">
+      <div class="chart-title">Compliance Score — 6-month trend</div>
+      <div class="chart-sub">All lenders combined average</div>
+      <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Audit Progress by Lender</div>
+      <div class="chart-sub">Questions answered vs total</div>
+      <div class="chart-wrap"><canvas id="lenderChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-bottom:20px">
+    <div class="chart-card">
+      <div class="chart-title">Document Compliance Status</div>
+      <div class="chart-sub">44 policy documents across all categories</div>
+      <div class="chart-wrap"><canvas id="docChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-title">Training Completion</div>
+      <div class="chart-sub">Security Awareness + SDLC combined</div>
+      <div class="chart-wrap"><canvas id="trainingChart"></canvas></div>
+    </div>
+  </div>
+
+  <!-- Risk Heatmap -->
+  <div class="card" style="margin-bottom:20px">
+    <div class="chart-title">Cross-Audit Risk Heatmap</div>
+    <div class="chart-sub" style="margin-bottom:16px">Security domain coverage across all lender audits — darker = higher risk</div>
+    <div id="heatmapContainer"></div>
+  </div>
+
+  <!-- Top Risk Table -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div><div class="chart-title">Top Risk Items — Requires Action</div></div>
+      <button class="export-btn" onclick="exportPDF()">Export Risk Register</button>
+    </div>
+    <div class="scroll-x">
+      <table class="tbl">
+        <thead><tr><th>Risk Item</th><th>Audit</th><th>Category</th><th>Risk Score</th><th>Owner</th><th>Due Date</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr class="risk-row"><td>BCP Document — not updated</td><td>IDFC</td><td>Business Continuity</td><td><div class="risk-score"><div class="risk-dot" style="background:var(--red2)"></div><span style="font-family:var(--mono);color:var(--red3)">9.2</span></div></td><td>Priya M.</td><td style="font-family:var(--mono);font-size:11px">30 Apr 2025</td><td><span class="badge b-red">Overdue</span></td></tr>
+          <tr class="risk-row"><td>PCI REQ-11: No VAPT evidence</td><td>PCI DSS</td><td>Testing & Monitoring</td><td><div class="risk-score"><div class="risk-dot" style="background:var(--red2)"></div><span style="font-family:var(--mono);color:var(--red3)">8.8</span></div></td><td>Dev T.</td><td style="font-family:var(--mono);font-size:11px">15 Jun 2025</td><td><span class="badge b-red">Overdue</span></td></tr>
+          <tr class="risk-row"><td>Logging & Monitoring Policy missing</td><td>ICICI</td><td>Monitoring</td><td><div class="risk-score"><div class="risk-dot" style="background:var(--amber2)"></div><span style="font-family:var(--mono);color:var(--amber3)">7.1</span></div></td><td>Rahul S.</td><td style="font-family:var(--mono);font-size:11px">31 Jul 2025</td><td><span class="badge b-amber">Pending</span></td></tr>
+          <tr class="risk-row"><td>Finance dept security training gap</td><td>All</td><td>Awareness</td><td><div class="risk-score"><div class="risk-dot" style="background:var(--amber2)"></div><span style="font-family:var(--mono);color:var(--amber3)">6.5</span></div></td><td>HR Team</td><td style="font-family:var(--mono);font-size:11px">30 Jun 2025</td><td><span class="badge b-amber">In Progress</span></td></tr>
+          <tr class="risk-row"><td>HDFC Q.47 — No VAPT evidence</td><td>HDFC</td><td>VAPT</td><td><div class="risk-score"><div class="risk-dot" style="background:var(--amber2)"></div><span style="font-family:var(--mono);color:var(--amber3)">6.2</span></div></td><td>Arjun K.</td><td style="font-family:var(--mono);font-size:11px">30 Jun 2025</td><td><span class="badge b-amber">Overdue</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NOTIFICATIONS ===== -->
+<div class="section" id="tab-notifications">
+  <div class="sec-head">
+    <div><div class="page-title">Notifications & Alerts</div><div class="page-sub">Due-date engine · escalation tiers · calendar sync</div></div>
+    <div style="display:flex;gap:8px">
+      <button class="export-btn">⚙ Configure Alerts</button>
+    </div>
+  </div>
+
+  <div class="g3" style="margin-bottom:20px">
+    <div class="mini-metric"><div class="mm-label">Critical (Escalated)</div><div class="mm-val" style="color:var(--red3)">4</div></div>
+    <div class="mini-metric"><div class="mm-label">Due in 7 Days</div><div class="mm-val" style="color:var(--amber3)">6</div></div>
+    <div class="mini-metric"><div class="mm-label">Informational</div><div class="mm-val" style="color:var(--blue2)">12</div></div>
+  </div>
+
+  <div class="inner-tabs">
+    <button class="itab active" onclick="switchInner('notif','all',this)">All (22)</button>
+    <button class="itab" onclick="switchInner('notif','critical',this)">🔴 Critical (4)</button>
+    <button class="itab" onclick="switchInner('notif','warning',this)">🟡 Warning (6)</button>
+    <button class="itab" onclick="switchInner('notif','info',this)">🔵 Info (12)</button>
+  </div>
+
+  <div id="notif-all" class="itab-panel active" style="display:grid;gap:8px">
+    <div class="notif-row"><div class="nr-icon" style="background:rgba(239,68,68,.1)">🚨</div><div class="nr-body"><div class="nr-title">BCP Document overdue — IDFC audit at risk</div><div class="nr-sub">Was due 30 Apr 2025. Escalated to CISO daily. IDFC submission in 21 days.</div><div class="nr-actions"><button class="act-btn primary">Resolve</button><button class="act-btn">Snooze 7d</button><button class="act-btn">Assign</button></div></div><div class="nr-time">2h ago</div></div>
+    <div class="notif-row"><div class="nr-icon" style="background:rgba(239,68,68,.1)">🔐</div><div class="nr-body"><div class="nr-title">PCI DSS REQ-11 — 6 controls non-compliant</div><div class="nr-sub">Network vulnerability testing overdue. QSA review scheduled for 30 Aug 2025.</div><div class="nr-actions"><button class="act-btn primary">View Controls</button><button class="act-btn">Assign Dev T.</button></div></div><div class="nr-time">5h ago</div></div>
+    <div class="notif-row"><div class="nr-icon" style="background:rgba(245,158,11,.1)">⏰</div><div class="nr-body"><div class="nr-title">HDFC Audit submission in 7 days</div><div class="nr-sub">18 questions still pending. 6 overdue responses need owner approval.</div><div class="nr-actions"><button class="act-btn primary">Review Questions</button><button class="act-btn">Notify Owners</button></div></div><div class="nr-time">1d ago</div></div>
+    <div class="notif-row"><div class="nr-icon" style="background:rgba(245,158,11,.1)">🎓</div><div class="nr-body"><div class="nr-title">Finance dept security training — 12 days left</div><div class="nr-sub">Only 4/22 Finance employees completed. Auto-reminder sent to HOD.</div><div class="nr-actions"><button class="act-btn">Send Reminder</button><button class="act-btn">View Report</button></div></div><div class="nr-time">1d ago</div></div>
+    <div class="notif-row"><div class="nr-icon" style="background:rgba(59,130,246,.1)">⚡</div><div class="nr-body"><div class="nr-title">ICICI — 97 questions extracted by RAG engine</div><div class="nr-sub">AI has drafted answers for 23 high-confidence questions. Review required for 74.</div><div class="nr-actions"><button class="act-btn primary">Review Drafts</button></div></div><div class="nr-time">5h ago</div></div>
+    <div class="notif-row"><div class="nr-icon" style="background:rgba(34,197,94,.1)">✅</div><div class="nr-body"><div class="nr-title">Cashify Audit submitted successfully</div><div class="nr-sub">All 45 answers approved. Awaiting Cashify final sign-off.</div></div><div class="nr-time">3d ago</div></div>
+  </div>
+
+  <!-- Escalation config -->
+  <hr>
+  <div class="section-label" style="margin-top:16px">Escalation Tier Configuration</div>
+  <div class="g3">
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px">🔵 30 Days Out</div><div style="font-size:11px;color:var(--text3);line-height:1.6">Email digest to item owner and audit manager. Summary in daily Slack briefing.</div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--amber3);margin-bottom:8px">🟡 7 Days Out</div><div style="font-size:11px;color:var(--text3);line-height:1.6">Urgent email to owner + manager + CISO. Slack DM with direct link. Calendar block created.</div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--red3);margin-bottom:8px">🔴 Overdue</div><div style="font-size:11px;color:var(--text3);line-height:1.6">Daily escalation to CISO. Lender portal flagged. Audit risk score degraded. WhatsApp alert.</div></div>
+  </div>
+</div>
+
+<!-- ===== LENDER AUDITS ===== -->
+<div class="section" id="tab-lender">
+  <div class="sec-head">
+    <div><div class="page-title">Lender Audits</div><div class="page-sub">AI-assisted questionnaire extraction · confidence scoring · approval workflow</div></div>
+    <button class="export-btn primary" onclick="openModal('uploadModal')">+ Upload Questionnaire</button>
+  </div>
+
+  <div class="g2">
+    <!-- HDFC -->
+    <div class="lender-card">
+      <div class="lender-head">
+        <div style="display:flex;align-items:center;gap:10px"><div class="lender-av av-hdfc">HDFC</div><div><div class="lender-name">HDFC Bank</div><div class="lender-type">Vendor Security Audit</div></div></div>
+        <span class="badge b-blue">In Progress</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-row"><span>82 / 100 answered</span><span style="font-family:var(--mono)">82%</span></div>
+        <div class="progress-bar"><div class="pf pf-blue" style="width:82%"></div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="chip chip-green">✓ 82 Done</span><span class="chip chip-amber">⏳ 12 Pending</span><span class="chip chip-red">⚠ 6 Overdue</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:12px">DEADLINE: 30 Jun 2025 · AUDITOR: HDFC InfoSec · TENANT: hdfc-2025</div>
+      <div style="display:grid;gap:6px">
+        <div class="q-item">
+          <div class="q-num">Q.31</div>
+          <div class="q-body">
+            <div class="q-text">What is your patch management cycle and SLA for critical vulnerabilities?</div>
+            <div class="q-meta"><span class="badge b-amber">Pending Review</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Conf: 91%</span><button class="act-btn" style="padding:2px 8px;font-size:10px" onclick="toggleEditor('ed-hdfc-q31')">Edit ✏</button></div>
+            <div class="rag-answer">
+              <div class="rag-header">
+                <span class="rag-tag">⚡ RAG Suggestion</span>
+                <div class="confidence-bar"><span>Confidence</span><div class="conf-track"><div class="conf-fill pf-green" style="width:91%"></div></div><span style="font-family:var(--mono);color:var(--green3)">91%</span></div>
+              </div>
+              <div class="rag-text">Our patch management cycle operates on a 30-day cycle for critical vulnerabilities (CVSS ≥ 9.0), 60-day for high (7.0–8.9), and 90-day for medium. Emergency patches for zero-day exploits are applied within 24 hours. Process governed by Patch Management Policy v2.3.</div>
+              <div class="rag-sources"><span class="src-pill">📄 Patch Mgmt Policy v2.3</span><span class="src-pill">📄 ISMS-2024-Report</span><span class="src-pill web">🌐 NIST SP 800-40r4</span></div>
+              <div class="rag-actions"><button class="act-btn approve" onclick="approveAnswer(this)">✓ Approve</button><button class="act-btn" onclick="toggleEditor('ed-hdfc-q31')">✏ Edit</button><button class="act-btn">↻ Regenerate</button></div>
+            </div>
+            <div class="answer-editor" id="ed-hdfc-q31">
+              <div class="ae-toolbar"><button class="ae-tool">B</button><button class="ae-tool">I</button><div class="ae-divider"></div><button class="ae-tool">↺</button></div>
+              <textarea class="ae-input">Our patch management cycle operates on a 30-day cycle for critical vulnerabilities (CVSS ≥ 9.0), 60-day for high (7.0–8.9), and 90-day for medium...</textarea>
+              <div class="ae-footer"><button class="act-btn" onclick="toggleEditor('ed-hdfc-q31')">Cancel</button><button class="act-btn approve">Save & Approve</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-num">Q.47</div>
+          <div class="q-body">
+            <div class="q-text">Provide evidence of last penetration test results and remediation status.</div>
+            <div class="q-meta"><span class="badge b-red">Overdue</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Conf: 64%</span><button class="act-btn" style="padding:2px 8px;font-size:10px">Review ↗</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IDFC -->
+    <div class="lender-card">
+      <div class="lender-head">
+        <div style="display:flex;align-items:center;gap:10px"><div class="lender-av av-idfc">IDFC</div><div><div class="lender-name">IDFC First Bank</div><div class="lender-type">Third Party Risk Assessment</div></div></div>
+        <span class="badge b-amber">Under Review</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-row"><span>53 / 75 answered</span><span style="font-family:var(--mono)">71%</span></div>
+        <div class="progress-bar"><div class="pf pf-teal" style="width:71%"></div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="chip chip-green">✓ 53 Done</span><span class="chip chip-amber">⏳ 18 Pending</span><span class="chip chip-purple">🤖 8 AI Draft</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:12px">DEADLINE: 15 Jul 2025 · BCP OVERDUE: escalated · TENANT: idfc-2025</div>
+      <div style="display:grid;gap:6px">
+        <div class="q-item">
+          <div class="q-num">Q.22</div>
+          <div class="q-body">
+            <div class="q-text">Describe your incident response process and escalation matrix.</div>
+            <div class="q-meta"><span class="badge b-blue">AI Draft</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Conf: 88%</span><button class="act-btn" style="padding:2px 8px;font-size:10px" onclick="toggleEditor('ed-idfc-q22')">Review ↗</button></div>
+            <div class="rag-answer" style="background:rgba(13,148,136,.04);border-color:rgba(13,148,136,.15)">
+              <div class="rag-header">
+                <span class="rag-tag" style="color:var(--teal3);background:rgba(13,148,136,.1)">⚡ RAG + Historical Match</span>
+                <div class="confidence-bar"><span>Confidence</span><div class="conf-track"><div class="conf-fill pf-teal" style="width:88%"></div></div><span style="font-family:var(--mono);color:var(--teal3)">88%</span></div>
+              </div>
+              <div class="rag-text">Incidents are classified P1–P4. P1/P2 trigger immediate CISO notification within 15 mins. Response team activates the Incident Response Playbook v2.5. RBI notification within 6 hours for data breaches per IT Framework 2023.</div>
+              <div class="rag-sources"><span class="src-pill">📄 IR Policy v3.0</span><span class="src-pill">📄 IDFC-FY24-Responses</span><span class="src-pill web">🌐 RBI IT Framework 2023</span></div>
+              <div class="rag-actions"><button class="act-btn approve" onclick="approveAnswer(this)">✓ Approve</button><button class="act-btn" onclick="toggleEditor('ed-idfc-q22')">✏ Edit</button></div>
+            </div>
+            <div class="answer-editor" id="ed-idfc-q22">
+              <div class="ae-toolbar"><button class="ae-tool">B</button><button class="ae-tool">I</button><div class="ae-divider"></div><button class="ae-tool">↺</button></div>
+              <textarea class="ae-input">Incidents are classified P1–P4. P1/P2 trigger immediate CISO notification within 15 mins...</textarea>
+              <div class="ae-footer"><button class="act-btn" onclick="toggleEditor('ed-idfc-q22')">Cancel</button><button class="act-btn approve">Save & Approve</button></div>
+            </div>
+          </div>
+        </div>
+        <div class="q-item">
+          <div class="q-num">Q.39</div>
+          <div class="q-body">
+            <div class="q-text">What is your BCDR RTO/RPO for Tier-1 applications?</div>
+            <div class="q-meta"><span class="badge b-amber">Pending</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Conf: 87%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CASHIFY -->
+    <div class="lender-card">
+      <div class="lender-head">
+        <div style="display:flex;align-items:center;gap:10px"><div class="lender-av av-cashify">CSH</div><div><div class="lender-name">Cashify</div><div class="lender-type">SaaS Security Assessment</div></div></div>
+        <span class="badge b-green">Submitted</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-row"><span>45 / 50 answered</span><span style="font-family:var(--mono)">90%</span></div>
+        <div class="progress-bar"><div class="pf pf-green" style="width:90%"></div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="chip chip-green">✓ 45 Done</span><span class="chip chip-amber">⏳ 5 Clarification</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:12px">SUBMITTED: 10 May 2025 · AWAITING Cashify sign-off · RAG reuse: 90%</div>
+      <div style="display:grid;gap:6px">
+        <div class="q-item"><div class="q-num">Q.5</div><div class="q-body"><div class="q-text">Do you conduct annual SOC 2 Type II or equivalent audit?</div><div class="q-meta"><span class="badge b-green">Approved</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">ISO 27001 cited</span></div></div></div>
+        <div class="q-item"><div class="q-num">Q.18</div><div class="q-body"><div class="q-text">How is customer PII isolated in your multi-tenant environment?</div><div class="q-meta"><span class="badge b-green">Approved</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">Conf: 96%</span></div></div></div>
+      </div>
+    </div>
+
+    <!-- ICICI -->
+    <div class="lender-card">
+      <div class="lender-head">
+        <div style="display:flex;align-items:center;gap:10px"><div class="lender-av av-icici">ICICI</div><div><div class="lender-name">ICICI Bank</div><div class="lender-type">Information Security Audit</div></div></div>
+        <span class="badge b-purple">Extraction Phase</span>
+      </div>
+      <div class="progress-wrap">
+        <div class="progress-row"><span>23 extracted · 0 answered of 120</span><span style="font-family:var(--mono)">19%</span></div>
+        <div class="progress-bar"><div class="pf pf-purple" style="width:19%"></div></div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap">
+        <span class="chip chip-purple">🤖 23 Extracted</span><span class="chip" style="background:rgba(255,255,255,.04);color:var(--text3)">97 Queued</span>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-bottom:12px">DEADLINE: 31 Aug 2025 · Uploaded 12 Jun 2025 · Parsing 97 remaining questions</div>
+      <!-- Pipeline -->
+      <div class="pipeline">
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Upload</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Parse PDF</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Extract Qs</div></div>
+        <div class="pipe-step active"><div class="ps-dot">⏳</div><div class="ps-label">Embed</div></div>
+        <div class="pipe-step"><div class="ps-dot">—</div><div class="ps-label">RAG Match</div></div>
+        <div class="pipe-step"><div class="ps-dot">—</div><div class="ps-label">Draft</div></div>
+      </div>
+      <div style="display:grid;gap:6px;margin-top:8px">
+        <div class="q-item"><div class="q-num">Q.1</div><div class="q-body"><div class="q-text">Provide ISO 27001 certification details and last audit date.</div><div class="q-meta"><span class="badge b-blue">AI Drafting</span></div></div></div>
+        <div class="q-item"><div class="q-num">Q.3</div><div class="q-body"><div class="q-text">How do you handle data breach notification per RBI guidelines?</div><div class="q-meta"><span class="badge b-amber">Web + RAG</span><span style="font-size:10px;color:var(--text3);font-family:var(--mono)">RBI IT 2023 retrieved</span></div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PCI DSS ===== -->
+<div class="section" id="tab-pci">
+  <div class="sec-head">
+    <div><div class="page-title">PCI DSS Audit</div><div class="page-sub">Payment Card Industry Data Security Standard v4.0 · QSA: CyberPro Assurance</div></div>
+    <div style="display:flex;gap:8px"><span class="badge b-amber">Assessment In Progress</span><button class="export-btn">Export Evidence Pack</button></div>
+  </div>
+  <div class="stat-grid" style="margin-bottom:20px">
+    <div class="stat-card"><div class="stat-top" style="background:var(--teal2)"></div><div class="stat-label">Total Controls</div><div class="stat-val" style="color:var(--teal3)">259</div><div class="stat-sub">Across 12 domains</div></div>
+    <div class="stat-card"><div class="stat-top" style="background:var(--green2)"></div><div class="stat-label">Compliant</div><div class="stat-val" style="color:var(--green3)">182</div><div class="stat-sub">70% fully met</div></div>
+    <div class="stat-card"><div class="stat-top" style="background:var(--amber2)"></div><div class="stat-label">Partial / WIP</div><div class="stat-val" style="color:var(--amber3)">52</div><div class="stat-sub">Remediation underway</div></div>
+    <div class="stat-card"><div class="stat-top" style="background:var(--red2)"></div><div class="stat-label">Non-Compliant</div><div class="stat-val" style="color:var(--red3)">25</div><div class="stat-sub">Requires action</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px">
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 1</span><span class="badge b-green">Compliant</span></div><div class="pci-title">Install & Maintain Network Security Controls</div><div class="progress-bar"><div class="pf pf-green" style="width:95%"></div></div><div class="ctrl-pills"><span class="ctrl done">1.1 ✓</span><span class="ctrl done">1.2 ✓</span><span class="ctrl done">1.3 ✓</span><span class="ctrl partial">1.4 ~</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 2</span><span class="badge b-green">Compliant</span></div><div class="pci-title">Apply Secure Configurations to All Components</div><div class="progress-bar"><div class="pf pf-green" style="width:88%"></div></div><div class="ctrl-pills"><span class="ctrl done">2.1 ✓</span><span class="ctrl done">2.2 ✓</span><span class="ctrl partial">2.3 ~</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 3</span><span class="badge b-blue">In Progress</span></div><div class="pci-title">Protect Stored Account Data</div><div class="progress-bar"><div class="pf pf-blue" style="width:72%"></div></div><div class="ctrl-pills"><span class="ctrl done">3.1 ✓</span><span class="ctrl done">3.2 ✓</span><span class="ctrl partial">3.3 ~</span><span class="ctrl todo">3.4 ✗</span><span class="ctrl partial">3.5 ~</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 4</span><span class="badge b-green">Compliant</span></div><div class="pci-title">Protect Cardholder Data with Cryptography</div><div class="progress-bar"><div class="pf pf-green" style="width:100%"></div></div><div class="ctrl-pills"><span class="ctrl done">4.1 ✓</span><span class="ctrl done">4.2 ✓</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 5</span><span class="badge b-blue">In Progress</span></div><div class="pci-title">Protect All Systems Against Malicious Software</div><div class="progress-bar"><div class="pf pf-amber" style="width:65%"></div></div><div class="ctrl-pills"><span class="ctrl done">5.1 ✓</span><span class="ctrl partial">5.2 ~</span><span class="ctrl todo">5.3 ✗</span><span class="ctrl partial">5.4 ~</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 6</span><span class="badge b-blue">In Progress</span></div><div class="pci-title">Develop & Maintain Secure Systems</div><div class="progress-bar"><div class="pf pf-amber" style="width:70%"></div></div><div class="ctrl-pills"><span class="ctrl done">6.1 ✓</span><span class="ctrl done">6.2 ✓</span><span class="ctrl partial">6.3 ~</span><span class="ctrl todo">6.4 ✗</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 7</span><span class="badge b-green">Compliant</span></div><div class="pci-title">Restrict Access to System Components</div><div class="progress-bar"><div class="pf pf-green" style="width:92%"></div></div><div class="ctrl-pills"><span class="ctrl done">7.1 ✓</span><span class="ctrl done">7.2 ✓</span><span class="ctrl partial">7.3 ~</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 8</span><span class="badge b-blue">In Progress</span></div><div class="pci-title">Identify Users & Authenticate Access</div><div class="progress-bar"><div class="pf pf-blue" style="width:78%"></div></div><div class="ctrl-pills"><span class="ctrl done">8.1 ✓</span><span class="ctrl done">8.2 ✓</span><span class="ctrl partial">8.3 ~</span><span class="ctrl done">8.4 ✓</span><span class="ctrl todo">8.5 ✗</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 9</span><span class="badge b-green">Compliant</span></div><div class="pci-title">Restrict Physical Access to Cardholder Data</div><div class="progress-bar"><div class="pf pf-green" style="width:85%"></div></div><div class="ctrl-pills"><span class="ctrl done">9.1 ✓</span><span class="ctrl done">9.2 ✓</span><span class="ctrl partial">9.3 ~</span><span class="ctrl done">9.4 ✓</span><span class="ctrl done">9.5 ✓</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 10</span><span class="badge b-blue">In Progress</span></div><div class="pci-title">Log and Monitor All Access</div><div class="progress-bar"><div class="pf pf-amber" style="width:60%"></div></div><div class="ctrl-pills"><span class="ctrl done">10.1 ✓</span><span class="ctrl partial">10.2 ~</span><span class="ctrl todo">10.3 ✗</span><span class="ctrl partial">10.4 ~</span><span class="ctrl todo">10.5 ✗</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 11</span><span class="badge b-red">Overdue</span></div><div class="pci-title">Test Security of Systems Regularly</div><div class="progress-bar"><div class="pf pf-red" style="width:45%"></div></div><div class="ctrl-pills"><span class="ctrl partial">11.1 ~</span><span class="ctrl todo">11.2 ✗</span><span class="ctrl todo">11.3 ✗</span><span class="ctrl partial">11.4 ~</span><span class="ctrl todo">11.5 ✗</span><span class="ctrl todo">11.6 ✗</span></div></div>
+    <div class="pci-domain"><div class="pci-head"><span class="pci-num">REQ 12</span><span class="badge b-blue">In Progress</span></div><div class="pci-title">Support InfoSec with Org Policies & Programs</div><div class="progress-bar"><div class="pf pf-blue" style="width:75%"></div></div><div class="ctrl-pills"><span class="ctrl done">12.1 ✓</span><span class="ctrl done">12.2 ✓</span><span class="ctrl partial">12.3 ~</span><span class="ctrl partial">12.4 ~</span><span class="ctrl done">12.5 ✓</span><span class="ctrl todo">12.6 ✗</span></div></div>
+  </div>
+</div>
+
+<!-- ===== TRAINING ===== -->
+<div class="section" id="tab-training">
+  <div class="sec-head"><div><div class="page-title">Security Training</div><div class="page-sub">Compliance tracking with auto-escalation for overdue employees</div></div></div>
+  <div class="g2" style="margin-bottom:16px">
+    <div class="training-card">
+      <div class="tc-icon blue">🛡</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:3px">Security Awareness Training</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Due: <span style="font-family:var(--mono)">30 Jun 2025</span> · Overall: <span style="font-family:var(--mono);color:var(--amber3)">68%</span></div>
+      <div class="progress-wrap" style="margin-bottom:14px"><div class="progress-row"><span>Completion</span><span style="font-family:var(--mono)">68%</span></div><div class="progress-bar"><div class="pf pf-blue" style="width:68%"></div></div></div>
+      <table class="tbl">
+        <thead><tr><th>Department</th><th>Staff</th><th>Done</th><th>%</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Board & C-Suite</td><td>8</td><td>8</td><td style="font-family:var(--mono)">100%</td><td><span class="badge b-green">Done</span></td></tr>
+          <tr><td>Engineering</td><td>120</td><td>78</td><td style="font-family:var(--mono)">65%</td><td><span class="badge b-amber">Pending</span></td></tr>
+          <tr><td>Sales & BD</td><td>45</td><td>45</td><td style="font-family:var(--mono)">100%</td><td><span class="badge b-green">Done</span></td></tr>
+          <tr><td>Finance</td><td>22</td><td>4</td><td style="font-family:var(--mono)">18%</td><td><span class="badge b-red">Overdue</span></td></tr>
+          <tr><td>HR & Admin</td><td>30</td><td>25</td><td style="font-family:var(--mono)">83%</td><td><span class="badge b-blue">In Progress</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="training-card">
+      <div class="tc-icon purple">⚙</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:3px">SDLC Security Training</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:12px">Due: <span style="font-family:var(--mono)">15 Aug 2025</span> · Overall: <span style="font-family:var(--mono);color:var(--amber3)">52%</span></div>
+      <div class="progress-wrap" style="margin-bottom:14px"><div class="progress-row"><span>Completion</span><span style="font-family:var(--mono)">52%</span></div><div class="progress-bar"><div class="pf pf-teal" style="width:52%"></div></div></div>
+      <table class="tbl">
+        <thead><tr><th>Module</th><th>Hrs</th><th>Done/Total</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>Secure Coding Fundamentals</td><td>4</td><td style="font-family:var(--mono)">92/120</td><td><span class="badge b-green">On Track</span></td></tr>
+          <tr><td>OWASP Top 10 — 2024</td><td>3</td><td style="font-family:var(--mono)">67/120</td><td><span class="badge b-blue">In Progress</span></td></tr>
+          <tr><td>Threat Modeling</td><td>2</td><td style="font-family:var(--mono)">30/120</td><td><span class="badge b-amber">Pending</span></td></tr>
+          <tr><td>Secure Code Review</td><td>5</td><td style="font-family:var(--mono)">18/120</td><td><span class="badge b-amber">Pending</span></td></tr>
+          <tr><td>DevSecOps Practices</td><td>3</td><td style="font-family:var(--mono)">0/120</td><td><span class="badge b-gray">Not Started</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:12px">Upcoming Training Sessions</div>
+    <table class="tbl">
+      <thead><tr><th>Training</th><th>Type</th><th>Date</th><th>Audience</th><th>Mode</th><th>Channel</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Phishing Simulation</td><td>Awareness</td><td style="font-family:var(--mono);font-size:11px">25 Jun 2025</td><td>All Staff</td><td>Online</td><td>Email + Slack</td><td><span class="badge b-blue">Scheduled</span></td></tr>
+        <tr><td>OWASP Top 10 Workshop</td><td>SDLC</td><td style="font-family:var(--mono);font-size:11px">5 Jul 2025</td><td>Engineering</td><td>Virtual ILT</td><td>Teams</td><td><span class="badge b-amber">Confirmed</span></td></tr>
+        <tr><td>Social Engineering</td><td>Awareness</td><td style="font-family:var(--mono);font-size:11px">18 Jul 2025</td><td>Finance, HR</td><td>Online</td><td>Email</td><td><span class="badge b-amber">Pending</span></td></tr>
+        <tr><td>Secure Code Review Lab</td><td>SDLC</td><td style="font-family:var(--mono);font-size:11px">1 Aug 2025</td><td>Dev Team</td><td>Hands-on</td><td>Slack</td><td><span class="badge b-gray">Planned</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===== INTERNAL ASSESSMENT ===== -->
+<div class="section" id="tab-internal">
+  <div class="sec-head"><div><div class="page-title">Internal Assessment</div><div class="page-sub">DR · BCP · Incident Management — documentation & testing</div></div></div>
+
+  <div class="acc-item">
+    <div class="acc-head open" onclick="toggleAcc(this)">
+      <div class="acc-left"><span style="font-size:18px">🔄</span><div><div class="acc-title">Disaster Recovery (DR)</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">RTO: 4hrs · RPO: 1hr · Last test: Mar 2025</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge b-blue">In Progress</span><span class="acc-chev">▼</span></div>
+    </div>
+    <div class="acc-body open">
+      <div class="g2" style="margin-bottom:14px">
+        <div><div class="section-label">DR Document</div><table class="tbl"><thead><tr><th>Item</th><th>Ver.</th><th>Due</th><th>Status</th></tr></thead><tbody><tr><td>DR Policy & Plan</td><td>v3.1</td><td style="font-family:var(--mono);font-size:11px">30 Jun</td><td><span class="badge b-green">Approved</span></td></tr><tr><td>DR Runbooks</td><td>v2.0</td><td style="font-family:var(--mono);font-size:11px">30 Jun</td><td><span class="badge b-green">Approved</span></td></tr><tr><td>Asset Recovery Matrix</td><td>v1.5</td><td style="font-family:var(--mono);font-size:11px">15 Jul</td><td><span class="badge b-blue">In Review</span></td></tr><tr><td>Backup Verification Log</td><td>—</td><td style="font-family:var(--mono);font-size:11px">Monthly</td><td><span class="badge b-green">Current</span></td></tr></tbody></table></div>
+        <div><div class="section-label">DR Test Report</div><table class="tbl"><thead><tr><th>Test</th><th>Last</th><th>Next Due</th><th>Status</th></tr></thead><tbody><tr><td>Tabletop Exercise</td><td style="font-family:var(--mono);font-size:11px">15 Jan</td><td style="font-family:var(--mono);font-size:11px">15 Jul</td><td><span class="badge b-amber">Due Soon</span></td></tr><tr><td>DB Failover Test</td><td style="font-family:var(--mono);font-size:11px">10 Mar</td><td style="font-family:var(--mono);font-size:11px">10 Sep</td><td><span class="badge b-green">Passed</span></td></tr><tr><td>Full DR Simulation</td><td style="font-family:var(--mono);font-size:11px">Nov 2024</td><td style="font-family:var(--mono);font-size:11px">Nov 2025</td><td><span class="badge b-green">Passed</span></td></tr><tr><td>Network Recovery</td><td>—</td><td style="font-family:var(--mono);font-size:11px">30 Jun</td><td><span class="badge b-red">Overdue</span></td></tr></tbody></table></div>
+      </div>
+      <div class="g3">
+        <div class="mini-metric"><div class="mm-label">RTO Target</div><div class="mm-val" style="color:var(--teal3)">4 hrs</div><div style="font-size:10px;color:var(--text3);margin-top:3px">Last test: 3.8 hrs ✓</div></div>
+        <div class="mini-metric"><div class="mm-label">RPO Target</div><div class="mm-val" style="color:var(--teal3)">1 hr</div><div style="font-size:10px;color:var(--text3);margin-top:3px">Last test: 45 min ✓</div></div>
+        <div class="mini-metric"><div class="mm-label">DR Score</div><div class="mm-val" style="color:var(--amber3)">78%</div><div style="font-size:10px;color:var(--text3);margin-top:3px">1 overdue test</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-left"><span style="font-size:18px">🏗</span><div><div class="acc-title">Business Continuity Plan (BCP)</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">Critical — BCP Master Doc OD 30 days</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge b-red">Action Required</span><span class="acc-chev">▼</span></div>
+    </div>
+    <div class="acc-body">
+      <div style="background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.15);border-radius:var(--r8);padding:10px 14px;font-size:11px;color:var(--red3);margin-bottom:14px">⚠ BCP Master Document overdue by 30 days. Tabletop exercise also overdue. IDFC deadline is 15 Jul 2025 — escalated to CISO.</div>
+      <div class="g2">
+        <div><div class="section-label">BCP Document</div><table class="tbl"><thead><tr><th>Item</th><th>Ver.</th><th>Due</th><th>Status</th></tr></thead><tbody><tr><td>BCP Master Document</td><td>v4.0</td><td style="font-family:var(--mono);font-size:11px">30 Apr</td><td><span class="badge b-red">Overdue</span></td></tr><tr><td>Business Impact Analysis</td><td>v2.2</td><td style="font-family:var(--mono);font-size:11px">30 May</td><td><span class="badge b-red">Overdue</span></td></tr><tr><td>Crisis Communication Plan</td><td>v1.8</td><td style="font-family:var(--mono);font-size:11px">15 Jul</td><td><span class="badge b-blue">In Review</span></td></tr><tr><td>Vendor Continuity Plan</td><td>v1.0</td><td style="font-family:var(--mono);font-size:11px">31 Jul</td><td><span class="badge b-amber">Pending</span></td></tr></tbody></table></div>
+        <div><div class="section-label">BCP Test Report</div><table class="tbl"><thead><tr><th>Test</th><th>Last</th><th>Next Due</th><th>Status</th></tr></thead><tbody><tr><td>Tabletop Exercise</td><td style="font-family:var(--mono);font-size:11px">10 Dec</td><td style="font-family:var(--mono);font-size:11px">10 Jun</td><td><span class="badge b-red">Overdue</span></td></tr><tr><td>Call Tree Test</td><td style="font-family:var(--mono);font-size:11px">05 Mar</td><td style="font-family:var(--mono);font-size:11px">05 Sep</td><td><span class="badge b-green">Passed</span></td></tr><tr><td>Full BCP Rehearsal</td><td style="font-family:var(--mono);font-size:11px">Oct 2024</td><td style="font-family:var(--mono);font-size:11px">Oct 2025</td><td><span class="badge b-green">Passed</span></td></tr></tbody></table></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="acc-item">
+    <div class="acc-head" onclick="toggleAcc(this)">
+      <div class="acc-left"><span style="font-size:18px">🚨</span><div><div class="acc-title">Incident Management</div><div style="font-size:10px;color:var(--text3);font-family:var(--mono)">IR Policy v3.0 · Playbook v2.5 · Last drill: May 2025</div></div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge b-green">On Track</span><span class="acc-chev">▼</span></div>
+    </div>
+    <div class="acc-body">
+      <div class="g2">
+        <div><div class="section-label">IM Document</div><table class="tbl"><thead><tr><th>Item</th><th>Ver.</th><th>Due</th><th>Status</th></tr></thead><tbody><tr><td>Incident Response Policy</td><td>v3.0</td><td>—</td><td><span class="badge b-green">Approved</span></td></tr><tr><td>IR Playbook</td><td>v2.5</td><td style="font-family:var(--mono);font-size:11px">30 Jun</td><td><span class="badge b-green">Approved</span></td></tr><tr><td>Severity Classification</td><td>v1.2</td><td>—</td><td><span class="badge b-green">Approved</span></td></tr><tr><td>Post-Incident Review Tmpl</td><td>v1.0</td><td style="font-family:var(--mono);font-size:11px">15 Jul</td><td><span class="badge b-blue">In Review</span></td></tr></tbody></table></div>
+        <div><div class="section-label">IM Drill Report</div><table class="tbl"><thead><tr><th>Drill</th><th>Date</th><th>Next</th><th>Status</th></tr></thead><tbody><tr><td>Ransomware Drill</td><td style="font-family:var(--mono);font-size:11px">Feb 2025</td><td style="font-family:var(--mono);font-size:11px">Aug 2025</td><td><span class="badge b-green">Passed</span></td></tr><tr><td>Data Breach Simulation</td><td style="font-family:var(--mono);font-size:11px">Apr 2025</td><td style="font-family:var(--mono);font-size:11px">Oct 2025</td><td><span class="badge b-green">Passed</span></td></tr><tr><td>Phishing Response Drill</td><td style="font-family:var(--mono);font-size:11px">May 2025</td><td style="font-family:var(--mono);font-size:11px">Nov 2025</td><td><span class="badge b-green">Passed</span></td></tr><tr><td>DDoS Response Drill</td><td>—</td><td style="font-family:var(--mono);font-size:11px">30 Jul</td><td><span class="badge b-amber">Scheduled</span></td></tr></tbody></table></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DOCUMENTS ===== -->
+<div class="section" id="tab-documents">
+  <div class="sec-head">
+    <div><div class="page-title">Document Review</div><div class="page-sub">44 policies · version tracking · review cycle management</div></div>
+    <div style="display:flex;gap:8px"><button class="export-btn" onclick="exportPDF()">⬇ Export Register</button></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center">
+    <div class="search-wrap" style="flex:1;max-width:320px"><input class="top-search" type="text" placeholder="Search documents..." id="docSearch" oninput="filterDocs()"></div>
+  </div>
+  <div class="filters">
+    <button class="fb active" onclick="setDocFilter('all',this)">All (44)</button>
+    <button class="fb" onclick="setDocFilter('complete',this)">✓ Current (24)</button>
+    <button class="fb" onclick="setDocFilter('pending',this)">⏳ Review Due (11)</button>
+    <button class="fb" onclick="setDocFilter('overdue',this)">⚠ Overdue (3)</button>
+    <button class="fb" onclick="setDocFilter('inprogress',this)">↻ In Review (6)</button>
+  </div>
+  <div class="doc-grid" id="docGrid"></div>
+</div>
+
+<!-- ===== RAG PIPELINE ===== -->
+<div class="section" id="tab-rag">
+  <div class="sec-head"><div><div class="page-title">RAG Engine</div><div class="page-sub">Ingestion pipeline · vector search · question bank · confidence scoring</div></div></div>
+
+  <div class="g3" style="margin-bottom:20px">
+    <div class="mini-metric"><div class="mm-label">Documents Indexed</div><div class="mm-val" style="color:var(--blue2)">1,284</div><div style="font-size:10px;color:var(--text3);margin-top:3px">+47 this week</div></div>
+    <div class="mini-metric"><div class="mm-label">Question Bank</div><div class="mm-val" style="color:var(--teal3)">892</div><div style="font-size:10px;color:var(--text3);margin-top:3px">canonical questions</div></div>
+    <div class="mini-metric"><div class="mm-label">Avg Conf. Score</div><div class="mm-val" style="color:var(--green3)">86.4%</div><div style="font-size:10px;color:var(--text3);margin-top:3px">last 30 days</div></div>
+  </div>
+
+  <!-- Upload Zone -->
+  <div class="upload-zone" id="uploadZone" onclick="simulateUpload()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+    <div class="uz-icon">⬆</div>
+    <div class="uz-main"><strong>Upload Audit Questionnaire</strong></div>
+    <div class="uz-main">PDF, DOCX, XLSX — RAG engine will extract & match automatically</div>
+    <div class="uz-sub">Max 50MB · Supports multi-page tables, nested lists, numbered questions</div>
+  </div>
+
+  <!-- Processing jobs -->
+  <div class="section-label" style="margin-top:16px">Processing Queue</div>
+  <div style="display:grid;gap:8px;margin-bottom:20px">
+    <div class="card-xs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:12px;font-weight:500">ICICI_InfoSec_Questionnaire_2025.pdf</span><span class="badge b-blue">Processing</span></div>
+      <div class="pipeline">
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Upload</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">PDF Parse</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Q Extract</div></div>
+        <div class="pipe-step active"><div class="ps-dot">⚙</div><div class="ps-label">Embed</div></div>
+        <div class="pipe-step"><div class="ps-dot">—</div><div class="ps-label">RAG Match</div></div>
+        <div class="pipe-step"><div class="ps-dot">—</div><div class="ps-label">Draft</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px">97 questions detected · 23 embedded · Estimated: 4 min remaining</div>
+    </div>
+    <div class="card-xs">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:12px;font-weight:500">HDFC_Vendor_Security_Questionnaire_v4.xlsx</span><span class="badge b-green">Complete</span></div>
+      <div class="pipeline">
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Upload</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">XLSX Parse</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Q Extract</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Embed</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">RAG Match</div></div>
+        <div class="pipe-step done"><div class="ps-dot">✓</div><div class="ps-label">Draft</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px">100 questions · 82 auto-matched · 18 low-confidence flagged for review</div>
+    </div>
+  </div>
+
+  <!-- Question Bank -->
+  <div class="section-label">Canonical Question Bank — Deduplication</div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Questions from different lenders that map to the same canonical answer (cosine similarity ≥ 0.85)</div>
+    <div style="display:grid;gap:8px">
+      <div class="card-xs">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;font-weight:600">Canonical: Data Encryption Policy</span><span style="font-family:var(--mono);font-size:10px;color:var(--green3)">3 lenders matched</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip chip-blue">HDFC Q.14</span><span class="chip chip-blue">IDFC Q.7</span><span class="chip chip-blue">ICICI Q.22</span></div>
+      </div>
+      <div class="card-xs">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;font-weight:600">Canonical: Incident Response Process</span><span style="font-family:var(--mono);font-size:10px;color:var(--green3)">4 lenders matched</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip chip-blue">HDFC Q.22</span><span class="chip chip-blue">IDFC Q.22</span><span class="chip chip-blue">ICICI Q.18</span><span class="chip chip-blue">Cashify Q.11</span></div>
+      </div>
+      <div class="card-xs">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:11px;font-weight:600">Canonical: VAPT Frequency & Methodology</span><span style="font-family:var(--mono);font-size:10px;color:var(--amber3)">2 lenders matched</span></div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><span class="chip chip-blue">HDFC Q.47</span><span class="chip chip-blue">ICICI Q.38</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Engine config -->
+  <div class="section-label">Engine Configuration</div>
+  <div class="g3">
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;margin-bottom:8px">Retrieval Settings</div><div style="display:grid;gap:6px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Top-k chunks</span><span style="font-family:var(--mono)">8</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Min confidence</span><span style="font-family:var(--mono)">0.70</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Auto-approve threshold</span><span style="font-family:var(--mono)">0.90</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Reranker</span><span style="font-family:var(--mono)">Cohere v3</span></div></div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;margin-bottom:8px">Data Sources</div><div style="display:grid;gap:6px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Policy documents</span><span class="badge b-green" style="font-size:9px">Active</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Historical answers</span><span class="badge b-green" style="font-size:9px">Active</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Web search (real-time)</span><span class="badge b-teal" style="font-size:9px">Active</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">RBI/CERT-In guidelines</span><span class="badge b-green" style="font-size:9px">Indexed</span></div></div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;margin-bottom:8px">Model Config</div><div style="display:grid;gap:6px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Embedding</span><span style="font-family:var(--mono)">text-emb-3-small</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">LLM</span><span style="font-family:var(--mono)">claude-sonnet-4</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Context window</span><span style="font-family:var(--mono)">32k tokens</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Temperature</span><span style="font-family:var(--mono)">0.2</span></div></div></div>
+  </div>
+</div>
+
+<!-- ===== AUDIT TRAIL ===== -->
+<div class="section" id="tab-trail">
+  <div class="sec-head">
+    <div><div class="page-title">Audit Trail</div><div class="page-sub">Immutable append-only log — tamper-evident · who changed what · when</div></div>
+    <div style="display:flex;gap:8px"><button class="export-btn">⬇ Export Log</button></div>
+  </div>
+  <div class="g3" style="margin-bottom:16px">
+    <div class="mini-metric"><div class="mm-label">Total Events</div><div class="mm-val" style="color:var(--blue2)">4,821</div></div>
+    <div class="mini-metric"><div class="mm-label">Today</div><div class="mm-val" style="color:var(--teal3)">47</div></div>
+    <div class="mini-metric"><div class="mm-label">Critical Events</div><div class="mm-val" style="color:var(--amber3)">12</div></div>
+  </div>
+  <div class="filters">
+    <button class="fb active">All</button>
+    <button class="fb">Answer Changes</button>
+    <button class="fb">Document Updates</button>
+    <button class="fb">User Actions</button>
+    <button class="fb">System Events</button>
+  </div>
+  <div class="card" style="font-family:var(--mono);font-size:11px">
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(34,197,94,.1)">✓</div><div class="trail-body"><div class="trail-title">HDFC Q.31 — Answer approved by Arjun K. (CISO)</div><div class="trail-meta">HDFC Audit · arjun.k@company.com · 192.168.1.45 · 2025-06-14 14:32:11 IST</div><div class="trail-hash">SHA-256: a3f9c2...4d71 · Block: #4821 · Prev: b8e2a1...9c04</div></div></div>
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(59,130,246,.1)">⚡</div><div class="trail-body"><div class="trail-title">RAG engine extracted 97 questions from ICICI PDF</div><div class="trail-meta">System · rag-engine@internal · 2025-06-14 09:15:44 IST</div><div class="trail-hash">SHA-256: 9d4e1b...7f23 · Block: #4819 · Prev: c1a8d7...2b56</div></div></div>
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(245,158,11,.1)">✏</div><div class="trail-body"><div class="trail-title">InfoSec Policy v3.2 — Edited by Priya M. (Audit Manager)</div><div class="trail-meta">Document Review · priya.m@company.com · 10.0.0.12 · 2025-06-14 11:20:05 IST</div><div class="trail-hash">SHA-256: f72a3c...1e89 · Block: #4818 · Prev: 9d4e1b...7f23</div></div></div>
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(239,68,68,.1)">🔔</div><div class="trail-body"><div class="trail-title">BCP Document — auto-escalated to CISO (overdue 30 days)</div><div class="trail-meta">Deadline Engine · system@internal · 2025-06-14 08:00:00 IST</div><div class="trail-hash">SHA-256: 3b9f2a...c541 · Block: #4815 · Prev: a72e4d...8b19</div></div></div>
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(124,58,237,.1)">👤</div><div class="trail-body"><div class="trail-title">New user created — rohan.shah@company.com (Reviewer role)</div><div class="trail-meta">RBAC · arjun.k@company.com · 192.168.1.45 · 2025-06-13 16:45:33 IST</div><div class="trail-hash">SHA-256: 7c1d5e...a234 · Block: #4812 · Prev: 2f8b3c...6d71</div></div></div>
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(13,148,136,.1)">🔐</div><div class="trail-body"><div class="trail-title">PCI REQ-11 status changed — Compliant → Overdue</div><div class="trail-meta">PCI DSS Module · system@internal · 2025-06-13 00:00:01 IST</div><div class="trail-hash">SHA-256: 4e8f1a...b903 · Block: #4810 · Prev: 7c1d5e...a234</div></div></div>
+    <div class="trail-item"><div class="trail-icon" style="background:rgba(34,197,94,.1)">📁</div><div class="trail-body"><div class="trail-title">Cashify Audit submitted — 45 answers, final report generated</div><div class="trail-meta">Lender Audit · priya.m@company.com · 10.0.0.12 · 2025-06-10 18:22:19 IST</div><div class="trail-hash">SHA-256: b5a7d2...e401 · Block: #4801 · Prev: 1c3f9e...7d52</div></div></div>
+  </div>
+</div>
+
+<!-- ===== RBAC ===== -->
+<div class="section" id="tab-rbac">
+  <div class="sec-head">
+    <div><div class="page-title">Users & Access Control</div><div class="page-sub">Role-based access · SSO (SAML 2.0 / OIDC) · MFA enforcement</div></div>
+    <div style="display:flex;gap:8px"><button class="export-btn primary" onclick="openModal('addUserModal')">+ Add User</button></div>
+  </div>
+
+  <div class="g4" style="margin-bottom:20px">
+    <div class="mini-metric"><div class="mm-label">Total Users</div><div class="mm-val" style="color:var(--blue2)">18</div></div>
+    <div class="mini-metric"><div class="mm-label">MFA Enrolled</div><div class="mm-val" style="color:var(--green3)">16</div></div>
+    <div class="mini-metric"><div class="mm-label">SSO Enabled</div><div class="mm-val" style="color:var(--teal3)">18</div></div>
+    <div class="mini-metric"><div class="mm-label">Pending Invite</div><div class="mm-val" style="color:var(--amber3)">2</div></div>
+  </div>
+
+  <!-- Role definitions -->
+  <div class="section-label">Role Permissions</div>
+  <div class="g4" style="margin-bottom:20px">
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--red3);margin-bottom:6px">CISO (Admin)</div><div style="font-size:10px;color:var(--text3);line-height:1.7">Full access · User management · Export · Delete · Audit trail · Settings</div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--amber3);margin-bottom:6px">Audit Manager</div><div style="font-size:10px;color:var(--text3);line-height:1.7">Edit answers · Approve · Upload docs · Assign tasks · View all</div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--blue3);margin-bottom:6px">Contributor</div><div style="font-size:10px;color:var(--text3);line-height:1.7">Draft answers · Upload docs · Edit assigned items only</div></div>
+    <div class="card-xs"><div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">Reviewer</div><div style="font-size:10px;color:var(--text3);line-height:1.7">Read-only · Comment on answers · No edit access</div></div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:13px;font-weight:600;margin-bottom:14px">Team Members</div>
+    <div class="user-row"><div class="u-av" style="background:linear-gradient(135deg,var(--blue),var(--purple2))">AK</div><div class="u-info"><div class="u-name">Arjun Kumar</div><div class="u-email">arjun.k@company.com</div></div><span class="badge b-red" style="margin-left:auto">CISO</span><span class="badge b-green" style="margin-left:6px">MFA ✓</span></div>
+    <div class="user-row"><div class="u-av" style="background:linear-gradient(135deg,var(--teal),var(--blue))">PM</div><div class="u-info"><div class="u-name">Priya Mehta</div><div class="u-email">priya.m@company.com</div></div><select class="role-select"><option>Audit Manager</option><option>CISO</option><option>Contributor</option><option>Reviewer</option></select><span class="badge b-green" style="margin-left:6px">MFA ✓</span></div>
+    <div class="user-row"><div class="u-av" style="background:linear-gradient(135deg,var(--amber),var(--pink2))">DT</div><div class="u-info"><div class="u-name">Dev Thakkar</div><div class="u-email">dev.t@company.com</div></div><select class="role-select"><option>Contributor</option><option>CISO</option><option>Audit Manager</option><option>Reviewer</option></select><span class="badge b-green" style="margin-left:6px">MFA ✓</span></div>
+    <div class="user-row"><div class="u-av" style="background:linear-gradient(135deg,var(--green),var(--teal))">RS</div><div class="u-info"><div class="u-name">Rohan Shah</div><div class="u-email">rohan.s@company.com</div></div><select class="role-select"><option>Reviewer</option><option>CISO</option><option>Audit Manager</option><option>Contributor</option></select><span class="badge b-amber" style="margin-left:6px">MFA ⏳</span></div>
+    <div class="user-row"><div class="u-av" style="background:linear-gradient(135deg,var(--purple),var(--pink))">NK</div><div class="u-info"><div class="u-name">Neha Kulkarni</div><div class="u-email">neha.k@company.com</div></div><select class="role-select"><option>Contributor</option><option>CISO</option><option>Audit Manager</option><option>Reviewer</option></select><span class="badge b-green" style="margin-left:6px">MFA ✓</span></div>
+  </div>
+
+  <hr>
+  <div class="section-label">Security Settings</div>
+  <div class="g2">
+    <div class="card-xs">
+      <div style="font-size:12px;font-weight:600;margin-bottom:10px">Authentication</div>
+      <div style="display:grid;gap:8px;font-size:11px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">SSO Provider</span><span style="font-family:var(--mono);color:var(--teal3)">Okta (SAML 2.0)</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">MFA Enforcement</span><span class="badge b-green">Mandatory</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Session Timeout</span><span style="font-family:var(--mono)">8 hours</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">IP Allowlist</span><span class="badge b-green">Active</span></div>
+      </div>
+    </div>
+    <div class="card-xs">
+      <div style="font-size:12px;font-weight:600;margin-bottom:10px">Data Security</div>
+      <div style="display:grid;gap:8px;font-size:11px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Encryption at Rest</span><span style="font-family:var(--mono);color:var(--green3)">AES-256</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Encryption in Transit</span><span style="font-family:var(--mono);color:var(--green3)">TLS 1.3</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Key Management</span><span style="font-family:var(--mono)">AWS KMS</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Tenant Isolation</span><span style="font-family:var(--mono);color:var(--teal3)">Schema-per-tenant</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- UPLOAD MODAL -->
+<div class="modal-bg" id="uploadModal" onclick="if(event.target===this)closeModal('uploadModal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Upload Audit Questionnaire</div><button class="modal-close" onclick="closeModal('uploadModal')">×</button></div>
+    <div class="form-field"><label class="form-label">Lender / Auditor</label><select class="form-select"><option>HDFC Bank</option><option>IDFC First Bank</option><option>Cashify</option><option>ICICI Bank</option><option>+ New Lender</option></select></div>
+    <div class="form-field"><label class="form-label">Audit Type</label><select class="form-select"><option>Vendor Security Audit</option><option>Third Party Risk Assessment</option><option>SaaS Assessment</option><option>Information Security Audit</option></select></div>
+    <div class="form-field"><label class="form-label">Submission Deadline</label><input class="form-input" type="date"></div>
+    <div class="upload-zone" style="margin-bottom:16px"><div class="uz-icon">📎</div><div class="uz-main"><strong>Click to browse</strong> or drag & drop</div><div class="uz-sub">PDF · DOCX · XLSX — max 50MB</div></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px"><button class="act-btn" onclick="closeModal('uploadModal')">Cancel</button><button class="act-btn primary" onclick="closeModal('uploadModal');alert('Questionnaire uploaded! RAG engine will extract questions shortly.')">Upload & Process</button></div>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-bg" id="settingsModal" onclick="if(event.target===this)closeModal('settingsModal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Settings</div><button class="modal-close" onclick="closeModal('settingsModal')">×</button></div>
+    <div class="inner-tabs"><button class="itab active" onclick="switchInner('set','gen',this)">General</button><button class="itab" onclick="switchInner('set','notif',this)">Notifications</button><button class="itab" onclick="switchInner('set','int',this)">Integrations</button></div>
+    <div id="set-gen" class="itab-panel active">
+      <div class="form-field"><label class="form-label">Organization Name</label><input class="form-input" value="FinSecure Pvt. Ltd."></div>
+      <div class="form-field"><label class="form-label">Default Timezone</label><select class="form-select"><option>Asia/Kolkata (IST)</option></select></div>
+      <div class="form-field"><label class="form-label">Fiscal Year</label><select class="form-select"><option>April – March</option></select></div>
+    </div>
+    <div id="set-notif" class="itab-panel">
+      <div style="display:grid;gap:10px;font-size:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Email notifications</span><span class="badge b-green">On</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Slack webhook</span><span class="badge b-green">Connected</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Calendar sync (Google)</span><span class="badge b-amber">Pending auth</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">WhatsApp alerts (overdue)</span><span class="badge b-gray">Off</span></div>
+      </div>
+    </div>
+    <div id="set-int" class="itab-panel">
+      <div style="display:grid;gap:10px;font-size:12px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Okta SSO</span><span class="badge b-green">Connected</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">AWS S3 (document storage)</span><span class="badge b-green">Connected</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Pinecone (vector DB)</span><span class="badge b-green">Connected</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2)">Jira (remediation tasks)</span><span class="badge b-amber">Configure</span></div>
+      </div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="act-btn" onclick="closeModal('settingsModal')">Cancel</button><button class="act-btn primary" onclick="closeModal('settingsModal')">Save Settings</button></div>
+  </div>
+</div>
+
+<!-- ADD USER MODAL -->
+<div class="modal-bg" id="addUserModal" onclick="if(event.target===this)closeModal('addUserModal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Add New User</div><button class="modal-close" onclick="closeModal('addUserModal')">×</button></div>
+    <div class="form-field"><label class="form-label">Full Name</label><input class="form-input" placeholder="e.g. Rahul Sharma"></div>
+    <div class="form-field"><label class="form-label">Work Email</label><input class="form-input" type="email" placeholder="rahul.s@company.com"></div>
+    <div class="form-field"><label class="form-label">Role</label><select class="form-select"><option>Reviewer</option><option>Contributor</option><option>Audit Manager</option><option>CISO</option></select></div>
+    <div class="form-field"><label class="form-label">Assigned Audits</label><select class="form-select" multiple style="height:80px"><option>HDFC Bank</option><option>IDFC First Bank</option><option>Cashify</option><option>ICICI Bank</option><option>PCI DSS</option></select></div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="act-btn" onclick="closeModal('addUserModal')">Cancel</button><button class="act-btn primary" onclick="closeModal('addUserModal');alert('Invitation sent! User will receive SSO onboarding email.')">Send Invite</button></div>
+  </div>
+</div>
+
+<script>
+// ── NAV ──
+function nav(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'analytics') initCharts();
+}
+
+// ── ACCORDION ──
+function toggleAcc(h) {
+  h.classList.toggle('open');
+  h.nextElementSibling.classList.toggle('open');
+}
+
+// ── INNER TABS ──
+function switchInner(ns, id, btn) {
+  const prefix = ns + '-';
+  document.querySelectorAll('[id^="' + prefix + '"]').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(prefix + id);
+  if (el) el.classList.add('active');
+  btn.closest('.inner-tabs').querySelectorAll('.itab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── NOTIFICATIONS ──
+function toggleNotif() {
+  document.getElementById('notifPanel').classList.toggle('open');
+}
+function clearNotifs() {
+  document.getElementById('notifPanel').classList.remove('open');
+}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notifPanel') && !e.target.closest('.topbar-btn')) {
+    document.getElementById('notifPanel').classList.remove('open');
+  }
+});
+
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── ANSWER EDITOR ──
+function toggleEditor(id) {
+  document.getElementById(id).classList.toggle('open');
+}
+function approveAnswer(btn) {
+  const card = btn.closest('.rag-answer');
+  card.style.borderColor = 'rgba(34,197,94,.3)';
+  card.style.background = 'rgba(34,197,94,.04)';
+  btn.textContent = '✓ Approved';
+  btn.disabled = true;
+}
+
+// ── DOCS ──
+const docs = [
+  {name:'Acceptable Usage Policy',due:'30 Jun 2025',status:'complete',icon:'📄',ver:'v2.1'},
+  {name:'Access Control Policy',due:'30 Jun 2025',status:'complete',icon:'🔑',ver:'v3.0'},
+  {name:'Anti-Bribery & Corruption Policy',due:'30 Sep 2025',status:'complete',icon:'⚖',ver:'v1.4'},
+  {name:'Anti-Virus Policy',due:'31 Jul 2025',status:'pending',icon:'🛡',ver:'v2.3'},
+  {name:'Application List',due:'Quarterly',status:'inprogress',icon:'📋',ver:'Q2 2025'},
+  {name:'Asset Management Policy',due:'30 Jun 2025',status:'complete',icon:'🖥',ver:'v2.0'},
+  {name:'Backup Policy',due:'15 Jul 2025',status:'pending',icon:'💾',ver:'v1.8'},
+  {name:'Business Impact Assessment',due:'30 Apr 2025',status:'overdue',icon:'📊',ver:'v2.2'},
+  {name:'BYOD Policy',due:'31 Aug 2025',status:'complete',icon:'📱',ver:'v1.5'},
+  {name:'Change Management Policy',due:'30 Jun 2025',status:'complete',icon:'🔄',ver:'v2.1'},
+  {name:'Clean Desk Policy',due:'30 Sep 2025',status:'complete',icon:'🗂',ver:'v1.2'},
+  {name:'Cloud Security Policy',due:'15 Jul 2025',status:'inprogress',icon:'☁',ver:'v2.0'},
+  {name:'Computing Devices Hardening Policy',due:'31 Jul 2025',status:'pending',icon:'🖧',ver:'v1.7'},
+  {name:'Cookie Policy',due:'30 Jun 2025',status:'complete',icon:'🍪',ver:'v1.3'},
+  {name:'Cryptography & Key Management Policy',due:'15 Aug 2025',status:'pending',icon:'🔐',ver:'v1.6'},
+  {name:'Cybersecurity Incident Management',due:'30 Jun 2025',status:'complete',icon:'🚨',ver:'v3.0'},
+  {name:'Data Flow Diagram',due:'Quarterly',status:'inprogress',icon:'🔀',ver:'Q1 2025'},
+  {name:'Data Management Policy',due:'30 Jun 2025',status:'complete',icon:'🗄',ver:'v2.4'},
+  {name:'Data Transmission Policy',due:'30 Jul 2025',status:'pending',icon:'📡',ver:'v1.5'},
+  {name:'Disaster Recovery Policy',due:'30 Jun 2025',status:'complete',icon:'♻',ver:'v3.1'},
+  {name:'Human Resource Security Policy',due:'31 Aug 2025',status:'complete',icon:'👥',ver:'v2.0'},
+  {name:'Incident Response Policy',due:'30 Jun 2025',status:'complete',icon:'🔥',ver:'v3.0'},
+  {name:'Information Security Policy',due:'30 Jun 2025',status:'complete',icon:'🔒',ver:'v3.2'},
+  {name:'Information Technology Policy',due:'30 Sep 2025',status:'complete',icon:'💻',ver:'v2.1'},
+  {name:'Lender SaaS Data Management Policy',due:'15 Jul 2025',status:'inprogress',icon:'🏦',ver:'v1.2'},
+  {name:'Logging & Monitoring Policy',due:'31 Jul 2025',status:'pending',icon:'📈',ver:'v1.4'},
+  {name:'Media Handling & Disposal Policy',due:'30 Sep 2025',status:'complete',icon:'🗑',ver:'v1.6'},
+  {name:'Network Diagram — Non-Prod',due:'Quarterly',status:'overdue',icon:'🌐',ver:'Q4 2024'},
+  {name:'Network Diagram — Production',due:'Quarterly',status:'inprogress',icon:'🌐',ver:'Q1 2025'},
+  {name:'Network Security Policy',due:'30 Jun 2025',status:'complete',icon:'🔌',ver:'v2.3'},
+  {name:'Onboarding & Offboarding Policy',due:'31 Aug 2025',status:'complete',icon:'🤝',ver:'v2.0'},
+  {name:'Organizational Chart',due:'Quarterly',status:'complete',icon:'🏢',ver:'Q2 2025'},
+  {name:'Password Protection Policy',due:'30 Jun 2025',status:'complete',icon:'🔑',ver:'v2.5'},
+  {name:'Patch Management Policy',due:'15 Jul 2025',status:'pending',icon:'🩹',ver:'v2.3'},
+  {name:'Physical Security Policy',due:'30 Sep 2025',status:'complete',icon:'🏛',ver:'v1.8'},
+  {name:'Risk Assessment',due:'Annual',status:'inprogress',icon:'⚠',ver:'FY25 Draft'},
+  {name:'SaaS Change Management Policy',due:'30 Jun 2025',status:'complete',icon:'🔄',ver:'v1.3'},
+  {name:'Scoping List of Facilities',due:'Annual',status:'overdue',icon:'📍',ver:'FY24'},
+  {name:'Secure Coding Policy',due:'31 Jul 2025',status:'pending',icon:'💻',ver:'v1.9'},
+  {name:'Software Development Lifecycle Policy',due:'30 Jun 2025',status:'complete',icon:'⚙',ver:'v2.2'},
+  {name:'System Hardening Policy — Cloud',due:'31 Jul 2025',status:'inprogress',icon:'☁',ver:'v1.4'},
+  {name:'Third Party Security Policy',due:'15 Jul 2025',status:'pending',icon:'🤝',ver:'v2.0'},
+  {name:'VAPT Policy',due:'30 Jun 2025',status:'complete',icon:'🔍',ver:'v2.1'},
+  {name:'Application Security Policy',due:'31 Aug 2025',status:'pending',icon:'📱',ver:'v1.0'},
+];
+const slabels = {complete:'Current',pending:'Review Due',overdue:'Overdue',inprogress:'In Review'};
+const sbadge = {complete:'b-green',pending:'b-amber',overdue:'b-red',inprogress:'b-blue'};
+let docFilter = 'all';
+
+function renderDocs() {
+  const q = (document.getElementById('docSearch')||{}).value||'';
+  const grid = document.getElementById('docGrid');
+  if (!grid) return;
+  const filtered = docs.filter(d => {
+    const mf = docFilter === 'all' || d.status === docFilter;
+    const ms = d.name.toLowerCase().includes(q.toLowerCase());
+    return mf && ms;
+  });
+  grid.innerHTML = filtered.map(d => `
+    <div class="doc-card">
+      <div class="doc-icon">${d.icon}</div>
+      <div class="doc-info">
+        <div class="doc-name" title="${d.name}">${d.name}</div>
+        <div class="doc-due">Due: ${d.due}</div>
+        <div class="doc-version">${d.ver}</div>
+      </div>
+      <span class="badge ${sbadge[d.status]}">${slabels[d.status]}</span>
+    </div>`).join('');
+}
+function filterDocs() { renderDocs(); }
+function setDocFilter(f, btn) {
+  docFilter = f;
+  document.querySelectorAll('.filters .fb').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDocs();
+}
+renderDocs();
+
+// ── EXPORT ──
+function exportPDF() { alert('Generating PDF report... (In production: Puppeteer/WeasyPrint generates branded PDF with cover page, compliance summary, and all Q&A pairs)'); }
+function exportXLSX() { alert('Generating XLSX export... (In production: SheetJS creates multi-sheet workbook with all audit data, risk register, and trend charts)'); }
+function simulateUpload() { alert('In production: file picker opens → RAG pipeline extracts questions → confidence-scored answers suggested automatically within minutes'); }
+
+// ── CHARTS ──
+let chartsInit = false;
+function initCharts() {
+  if (chartsInit) return;
+  chartsInit = true;
+  const cOpts = { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8b9dc3', font: { size: 11, family: "'Inter',sans-serif" }, boxWidth: 12, padding: 16 } }, tooltip: { backgroundColor: '#1a2540', titleColor: '#e2e8f5', bodyColor: '#8b9dc3', borderColor: 'rgba(255,255,255,0.08)', borderWidth: 1 } }, scales: { x: { ticks: { color: '#4d5e80', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' } }, y: { ticks: { color: '#4d5e80', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.04)' }, min: 0, max: 100 } } };
+
+  // Trend
+  new Chart(document.getElementById('trendChart'), {
+    type: 'line',
+    data: {
+      labels: ['Jan','Feb','Mar','Apr','May','Jun'],
+      datasets: [
+        { label: 'HDFC', data: [70,72,76,78,80,82], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.08)', tension: 0.4, fill: true, pointRadius: 3 },
+        { label: 'IDFC', data: [60,63,65,67,69,71], borderColor: '#14b8a6', backgroundColor: 'rgba(20,184,166,0.08)', tension: 0.4, fill: true, pointRadius: 3 },
+        { label: 'Cashify', data: [80,82,84,86,88,90], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.08)', tension: 0.4, fill: true, pointRadius: 3 },
+        { label: 'PCI DSS', data: [65,68,70,72,75,78], borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,0.06)', tension: 0.4, fill: true, pointRadius: 3 },
+      ]
+    },
+    options: { ...cOpts, scales: { ...cOpts.scales, y: { ...cOpts.scales.y, ticks: { ...cOpts.scales.y.ticks, callback: v => v + '%' } } } }
+  });
+
+  // Lender bar
+  new Chart(document.getElementById('lenderChart'), {
+    type: 'bar',
+    data: {
+      labels: ['HDFC', 'IDFC', 'Cashify', 'ICICI'],
+      datasets: [
+        { label: 'Answered', data: [82, 53, 45, 0], backgroundColor: 'rgba(59,130,246,0.7)', borderRadius: 4 },
+        { label: 'Pending', data: [12, 18, 5, 0], backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 4 },
+        { label: 'Extracted', data: [0, 0, 0, 23], backgroundColor: 'rgba(167,139,250,0.7)', borderRadius: 4 },
+      ]
+    },
+    options: { ...cOpts, scales: { x: { ...cOpts.scales.x, stacked: true }, y: { ...cOpts.scales.y, stacked: true, max: 120 } }, plugins: { ...cOpts.plugins } }
+  });
+
+  // Doc doughnut
+  new Chart(document.getElementById('docChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Current (24)', 'Review Due (11)', 'In Review (6)', 'Overdue (3)'],
+      datasets: [{ data: [24, 11, 6, 3], backgroundColor: ['rgba(34,197,94,0.7)', 'rgba(245,158,11,0.7)', 'rgba(59,130,246,0.7)', 'rgba(239,68,68,0.7)'], borderWidth: 0, hoverOffset: 6 }]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: '#8b9dc3', font: { size: 11 }, boxWidth: 12, padding: 12 } }, tooltip: { backgroundColor: '#1a2540', titleColor: '#e2e8f5', bodyColor: '#8b9dc3' } }, cutout: '68%' }
+  });
+
+  // Training bar
+  new Chart(document.getElementById('trainingChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Board','Engineering','Sales','Finance','HR'],
+      datasets: [
+        { label: 'Completed', data: [100, 65, 100, 18, 83], backgroundColor: 'rgba(20,184,166,0.7)', borderRadius: 4 },
+        { label: 'Remaining', data: [0, 35, 0, 82, 17], backgroundColor: 'rgba(255,255,255,0.06)', borderRadius: 4 },
+      ]
+    },
+    options: { ...cOpts, scales: { x: { ...cOpts.scales.x, stacked: true }, y: { ...cOpts.scales.y, stacked: true, max: 100, ticks: { ...cOpts.scales.y.ticks, callback: v => v + '%' } } } }
+  });
+
+  // Heatmap
+  buildHeatmap();
+}
+
+function buildHeatmap() {
+  const container = document.getElementById('heatmapContainer');
+  if (!container) return;
+  const domains = ['Access Control','Encryption','Incident Resp.','Patch Mgmt','VAPT','BCP/DR','Logging','Phys. Security','SDLC','3rd Party'];
+  const audits = ['HDFC','IDFC','Cashify','ICICI','PCI DSS'];
+  const scores = [
+    [85,72,90,60,78],[80,65,88,55,82],[90,75,92,68,85],
+    [70,60,85,50,72],[65,55,80,45,65],[40,30,75,35,45],
+    [75,60,82,52,60],[88,80,90,70,90],[78,68,85,60,75],[72,62,80,55,70]
+  ];
+  const getColor = v => v >= 80 ? 'rgba(34,197,94,0.7)' : v >= 65 ? 'rgba(245,158,11,0.6)' : 'rgba(239,68,68,0.65)';
+  let html = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:separate;border-spacing:3px">';
+  html += '<thead><tr><th style="text-align:left;font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px 8px">Domain</th>' + audits.map(a => `<th style="font-size:10px;color:var(--text3);font-family:var(--mono);padding:4px 6px;text-align:center">${a}</th>`).join('') + '</tr></thead><tbody>';
+  domains.forEach((d, i) => {
+    html += `<tr><td style="font-size:11px;color:var(--text2);padding:4px 8px;white-space:nowrap">${d}</td>`;
+    audits.forEach((a, j) => {
+      const v = scores[i][j];
+      html += `<td style="background:${getColor(v)};border-radius:4px;text-align:center;padding:6px 4px;font-size:10px;font-family:var(--mono);color:rgba(255,255,255,0.9);cursor:pointer" title="${d} — ${a}: ${v}%">${v}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  html += '<div style="display:flex;gap:16px;margin-top:10px;font-size:10px;color:var(--text3)"><span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;background:rgba(34,197,94,0.7);border-radius:2px;display:inline-block"></span>≥80 Good</span><span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;background:rgba(245,158,11,0.6);border-radius:2px;display:inline-block"></span>65–79 Partial</span><span style="display:flex;align-items:center;gap:5px"><span style="width:12px;height:12px;background:rgba(239,68,68,0.65);border-radius:2px;display:inline-block"></span>&lt;65 At Risk</span></div></div>';
+  container.innerHTML = html;
+}
+
+// Date header
+document.addEventListener('DOMContentLoaded', () => {
+  const now = new Date();
+  document.title = 'SecureAudit RAG v2 — ' + now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+});
+</script>
+</body>
+</html>
