@@ -365,6 +365,23 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0}
 .form-input:focus{border-color:var(--blue)}
 .form-select{width:100%;background:var(--bg4);border:1px solid var(--border);border-radius:var(--r8);padding:8px 12px;color:var(--text);font-family:var(--font);font-size:12px;outline:none;cursor:pointer}
 
+/* ── KB + CHAT ── */
+.mini-btn{border:1px solid var(--border);background:rgba(255,255,255,0.02);color:var(--text2);border-radius:8px;padding:6px 10px;font-size:11px;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.mini-btn:hover{border-color:var(--border2);color:var(--text);background:rgba(255,255,255,0.04)}
+.mini-btn.danger{border-color:rgba(239,68,68,.25);color:var(--red3);background:rgba(239,68,68,.05)}
+.mini-btn.danger:hover{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08)}
+.mini-btn.primary{border-color:rgba(59,130,246,.25);color:var(--blue2);background:rgba(59,130,246,.06)}
+.mini-btn.primary:hover{border-color:rgba(59,130,246,.35);background:rgba(59,130,246,.10)}
+.hint{font-size:10px;color:var(--text3);font-family:var(--mono);line-height:1.6}
+.chat-shell{display:flex;flex-direction:column;min-height:520px}
+.chat-log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--border);border-radius:var(--r12);background:rgba(255,255,255,0.02)}
+.chat-bubble{max-width:78%;padding:10px 12px;border-radius:14px;font-size:12px;line-height:1.55;border:1px solid var(--border2)}
+.chat-bubble.user{align-self:flex-end;background:rgba(59,130,246,.10);border-color:rgba(59,130,246,.25)}
+.chat-bubble.bot{align-self:flex-start;background:rgba(34,197,94,.08);border-color:rgba(34,197,94,.22)}
+.chat-bubble .chat-meta{margin-top:6px;font-size:10px;color:var(--text3);font-family:var(--mono)}
+.chat-input-row{display:flex;gap:8px;margin-top:10px}
+.chat-input-row .form-input{flex:1}
+
 /* ── SECURITY SCORE RING ── */
 .score-ring{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px}
 canvas.ring-canvas{display:block}
@@ -428,6 +445,9 @@ canvas.ring-canvas{display:block}
 
   <div class="sidebar-section">AI Engine</div>
   <button class="nav-btn" onclick="nav('rag',this)"><span class="nav-icon">⚡</span>RAG Pipeline</button>
+  <button class="nav-btn" onclick="nav('kb',this)"><span class="nav-icon">🧠</span>Knowledge Base</button>
+  <button class="nav-btn" onclick="nav('audit',this)"><span class="nav-icon">📤</span>Audit Upload</button>
+  <button class="nav-btn" onclick="nav('chat',this)"><span class="nav-icon">💬</span>Chatbot</button>
   <button class="nav-btn" onclick="nav('trail',this)"><span class="nav-icon">📜</span>Audit Trail</button>
 
   <div class="sidebar-section">Admin</div>
@@ -943,7 +963,7 @@ canvas.ring-canvas{display:block}
   </div>
 
   <!-- Upload Zone -->
-  <div class="upload-zone" id="uploadZone" onclick="simulateUpload()" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
+  <div class="upload-zone" id="uploadZone" onclick="openModal('uploadModal')" ondragover="event.preventDefault();this.classList.add('dragover')" ondragleave="this.classList.remove('dragover')">
     <div class="uz-icon">⬆</div>
     <div class="uz-main"><strong>Upload Audit Questionnaire</strong></div>
     <div class="uz-main">PDF, DOCX, XLSX — RAG engine will extract & match automatically</div>
@@ -1005,6 +1025,136 @@ canvas.ring-canvas{display:block}
     <div class="card-xs"><div style="font-size:11px;font-weight:600;margin-bottom:8px">Retrieval Settings</div><div style="display:grid;gap:6px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Top-k chunks</span><span style="font-family:var(--mono)">8</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Min confidence</span><span style="font-family:var(--mono)">0.70</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Auto-approve threshold</span><span style="font-family:var(--mono)">0.90</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Reranker</span><span style="font-family:var(--mono)">Cohere v3</span></div></div></div>
     <div class="card-xs"><div style="font-size:11px;font-weight:600;margin-bottom:8px">Data Sources</div><div style="display:grid;gap:6px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Policy documents</span><span class="badge b-green" style="font-size:9px">Active</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Historical answers</span><span class="badge b-green" style="font-size:9px">Active</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Web search (real-time)</span><span class="badge b-teal" style="font-size:9px">Active</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">RBI/CERT-In guidelines</span><span class="badge b-green" style="font-size:9px">Indexed</span></div></div></div>
     <div class="card-xs"><div style="font-size:11px;font-weight:600;margin-bottom:8px">Model Config</div><div style="display:grid;gap:6px;font-size:11px"><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Embedding</span><span style="font-family:var(--mono)">text-emb-3-small</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">LLM</span><span style="font-family:var(--mono)">claude-sonnet-4</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Context window</span><span style="font-family:var(--mono)">32k tokens</span></div><div style="display:flex;justify-content:space-between"><span style="color:var(--text3)">Temperature</span><span style="font-family:var(--mono)">0.2</span></div></div></div>
+  </div>
+</div>
+
+<!-- ===== KNOWLEDGE BASE ===== -->
+<div class="section" id="tab-kb">
+  <div class="sec-head">
+    <div><div class="page-title">Knowledge Base</div><div class="page-sub">Canonical questions · approved answers · import/export</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="export-btn" onclick="kbExport()">⬇ Export JSON</button>
+      <button class="export-btn" onclick="document.getElementById('kbImportInput').click()">⬆ Import</button>
+      <button class="export-btn primary" onclick="openModal('kbEntryModal');kbOpenNew()">+ Add Entry</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:12px;align-items:center;flex-wrap:wrap">
+    <div class="search-wrap" style="flex:1;max-width:420px"><input class="top-search" type="text" placeholder="Search knowledge base..." id="kbSearch" oninput="renderKB()"></div>
+    <select class="form-select" style="max-width:220px" id="kbCategoryFilter" onchange="renderKB()"></select>
+    <span class="badge b-gray" id="kbCountBadge">0 entries</span>
+  </div>
+
+  <div class="card">
+    <div style="overflow:auto">
+      <table class="tbl" id="kbTable">
+        <thead><tr><th style="width:28%">Question</th><th>Answer</th><th style="width:14%">Category</th><th style="width:130px">Actions</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <div class="section-label">Knowledge-Base-Only Policy</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7">
+      The assistant never invents answers. If a question does not match the knowledge base with confidence ≥ <span style="font-family:var(--mono)">0.80</span>, it returns:
+      <span style="font-family:var(--mono);color:var(--text3)">No answer found in knowledge base. Manual response required.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AUDIT UPLOAD ===== -->
+<div class="section" id="tab-audit">
+  <div class="sec-head">
+    <div><div class="page-title">Audit Questionnaire Upload</div><div class="page-sub">Extract questions · match to knowledge base · confidence scoring</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="export-btn" onclick="downloadAuditTemplate()">⬇ Download CSV Template</button>
+      <button class="export-btn primary" onclick="triggerAuditPick()">+ Upload & Process</button>
+    </div>
+  </div>
+
+  <input id="auditUploadInput" type="file" accept=".csv,.xlsx,.xls,.docx,application/json" style="display:none" onchange="handleAuditFileSelect(this.files[0]);this.value=''">
+
+  <div class="g2" style="margin-bottom:16px">
+    <div class="card">
+      <div class="section-label">Upload</div>
+      <div class="upload-zone" id="auditUploadZone"
+           onclick="triggerAuditPick()"
+           ondragover="event.preventDefault();this.classList.add('dragover')"
+           ondragleave="this.classList.remove('dragover')"
+           ondrop="event.preventDefault();this.classList.remove('dragover');handleAuditFileSelect(event.dataTransfer.files[0])">
+        <div class="uz-icon">📎</div>
+        <div class="uz-main"><strong>Click to browse</strong> or drag & drop</div>
+        <div class="uz-sub">CSV · XLSX · DOCX (PDF = future)</div>
+      </div>
+      <div class="hint" id="auditUploadHint" style="margin-top:10px">
+        Tip: For CSV/XLSX, include a column named <span style="color:var(--text2)">Question</span>. If missing, the first column is used.
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-label">Recent Uploads</div>
+      <div id="auditList" style="display:grid;gap:8px"></div>
+    </div>
+  </div>
+
+  <div class="section-label">Results</div>
+  <div class="hint" style="margin:-6px 0 10px">Auto-fill threshold: <span style="font-family:var(--mono)">0.70</span> (70%). Below this, results are marked Manual.</div>
+  <div class="filters">
+    <button class="fb active" onclick="setAuditResultFilter('all',this)">All</button>
+    <button class="fb" onclick="setAuditResultFilter('auto',this)">Auto</button>
+    <button class="fb" onclick="setAuditResultFilter('manual',this)">Manual</button>
+  </div>
+  <div class="card">
+    <div class="hint" id="auditActiveLabel" style="margin-bottom:10px">No audit selected.</div>
+    <div style="overflow:auto">
+      <table class="tbl" id="auditResultsTable">
+        <thead><tr><th style="width:34%">Question</th><th>Suggested Answer</th><th style="width:110px">Confidence</th><th style="width:28%">Source Question</th><th style="width:90px">Status</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CHATBOT ===== -->
+<div class="section" id="tab-chat">
+  <div class="sec-head">
+    <div><div class="page-title">Chatbot Assistant</div><div class="page-sub">Retrieval-only Q&A from the knowledge base · no hallucinations</div></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="export-btn" onclick="chatClear()">Clear Chat</button>
+      <button class="export-btn" onclick="chatExport()">⬇ Export History</button>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="chat-shell">
+        <div class="chat-log" id="chatLog"></div>
+        <div class="chat-input-row">
+          <input class="form-input" id="chatInput" placeholder="Ask an audit/control question (e.g., Do you enforce MFA for administrators?)" onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendChat()}">
+          <button class="act-btn primary" onclick="sendChat()">Send</button>
+        </div>
+        <div class="hint" style="margin-top:10px">
+          KB-only policy: If confidence &lt; <span style="font-family:var(--mono)">0.80</span>, the bot returns <span style="font-family:var(--mono)">Manual response required</span>.
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="section-label">Last Match</div>
+      <div id="chatLastMatch" class="hint">No queries yet.</div>
+      <div class="section-label" style="margin-top:14px">Quick Prompts</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="mini-btn" onclick="chatQuick('Do you enforce MFA for administrators?')">MFA for admins</button>
+        <button class="mini-btn" onclick="chatQuick('Do you monitor firewall logs?')">Firewall logs</button>
+        <button class="mini-btn" onclick="chatQuick('Do you encrypt cardholder data?')">Encryption</button>
+        <button class="mini-btn" onclick="chatQuick('Do you conduct VAPT regularly?')">VAPT</button>
+      </div>
+      <hr style="margin:14px 0;border:0;border-top:1px solid var(--border)">
+      <div class="section-label">Match Settings</div>
+      <div style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text2);font-size:12px">Min confidence</span><span style="font-family:var(--mono)" id="kbThresholdLabel">0.80</span></div>
+        <input type="range" min="0.60" max="0.95" step="0.01" value="0.80" id="kbThreshold" oninput="setKBThreshold(parseFloat(this.value))">
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1096,6 +1246,8 @@ canvas.ring-canvas{display:block}
 </div><!-- /main -->
 </div><!-- /layout -->
 
+<input id="kbImportInput" type="file" accept=".json,application/json,.csv,text/csv,.xlsx,.xls" style="display:none" onchange="kbImportFromFile(this.files[0]);this.value=''">
+
 <!-- UPLOAD MODAL -->
 <div class="modal-bg" id="uploadModal" onclick="if(event.target===this)closeModal('uploadModal')">
   <div class="modal">
@@ -1103,8 +1255,40 @@ canvas.ring-canvas{display:block}
     <div class="form-field"><label class="form-label">Lender / Auditor</label><select class="form-select"><option>HDFC Bank</option><option>IDFC First Bank</option><option>Cashify</option><option>ICICI Bank</option><option>+ New Lender</option></select></div>
     <div class="form-field"><label class="form-label">Audit Type</label><select class="form-select"><option>Vendor Security Audit</option><option>Third Party Risk Assessment</option><option>SaaS Assessment</option><option>Information Security Audit</option></select></div>
     <div class="form-field"><label class="form-label">Submission Deadline</label><input class="form-input" type="date"></div>
-    <div class="upload-zone" style="margin-bottom:16px"><div class="uz-icon">📎</div><div class="uz-main"><strong>Click to browse</strong> or drag & drop</div><div class="uz-sub">PDF · DOCX · XLSX — max 50MB</div></div>
-    <div style="display:flex;justify-content:flex-end;gap:8px"><button class="act-btn" onclick="closeModal('uploadModal')">Cancel</button><button class="act-btn primary" onclick="closeModal('uploadModal');alert('Questionnaire uploaded! RAG engine will extract questions shortly.')">Upload & Process</button></div>
+    <input id="auditModalFile" type="file" accept=".csv,.xlsx,.xls,.docx,application/json" style="display:none" onchange="auditModalSelectFile(this.files[0])">
+    <div class="upload-zone" id="auditModalDrop" style="margin-bottom:12px"
+         onclick="document.getElementById('auditModalFile').click()"
+         ondragover="event.preventDefault();this.classList.add('dragover')"
+         ondragleave="this.classList.remove('dragover')"
+         ondrop="event.preventDefault();this.classList.remove('dragover');auditModalSelectFile(event.dataTransfer.files[0])">
+      <div class="uz-icon">📎</div>
+      <div class="uz-main"><strong>Click to browse</strong> or drag & drop</div>
+      <div class="uz-sub">CSV · XLSX · DOCX (PDF = future)</div>
+    </div>
+    <div class="hint" id="auditModalStatus" style="margin-bottom:10px">No file selected.</div>
+    <div style="display:flex;justify-content:flex-end;gap:8px">
+      <button class="act-btn" onclick="closeModal('uploadModal')">Cancel</button>
+      <button class="act-btn primary" onclick="processAuditFromModal()">Upload & Process</button>
+    </div>
+  </div>
+</div>
+
+<!-- KB ENTRY MODAL -->
+<div class="modal-bg" id="kbEntryModal" onclick="if(event.target===this)closeModal('kbEntryModal')">
+  <div class="modal">
+    <div class="modal-head"><div class="modal-title">Knowledge Base Entry</div><button class="modal-close" onclick="closeModal('kbEntryModal')">×</button></div>
+    <input id="kbEntryId" type="hidden">
+    <div class="form-field"><label class="form-label">Category</label><input class="form-input" id="kbEntryCategory" placeholder="e.g. Access Control"></div>
+    <div class="form-field"><label class="form-label">Question</label><input class="form-input" id="kbEntryQuestion" placeholder="e.g. Is multi-factor authentication enabled for privileged accounts?"></div>
+    <div class="form-field"><label class="form-label">Answer</label><textarea class="form-input" id="kbEntryAnswer" rows="5" placeholder="Answer pulled verbatim from your approved knowledge base."></textarea></div>
+    <div class="hint" id="kbEntryStatus" style="margin:-6px 0 10px">Saved answers are used verbatim for Auto matches.</div>
+    <div style="display:flex;justify-content:space-between;gap:8px;margin-top:10px">
+      <button class="act-btn" onclick="closeModal('kbEntryModal')">Cancel</button>
+      <div style="display:flex;gap:8px">
+        <button class="act-btn" onclick="kbDeleteFromModal()">Delete</button>
+        <button class="act-btn primary" onclick="kbSaveFromModal()">Save</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -1288,7 +1472,843 @@ renderDocs();
 // ── EXPORT ──
 function exportPDF() { alert('Generating PDF report... (In production: Puppeteer/WeasyPrint generates branded PDF with cover page, compliance summary, and all Q&A pairs)'); }
 function exportXLSX() { alert('Generating XLSX export... (In production: SheetJS creates multi-sheet workbook with all audit data, risk register, and trend charts)'); }
-function simulateUpload() { alert('In production: file picker opens → RAG pipeline extracts questions → confidence-scored answers suggested automatically within minutes'); }
+function simulateUpload() { openModal('uploadModal'); }
+
+// ── AI Cybersecurity Audit Assistant (KB-only prototype) ──
+const SA_STORAGE = {
+  KB: 'sa_kb_v1',
+  AUDITS: 'sa_audits_v1',
+  CHAT: 'sa_chat_v1',
+  SETTINGS: 'sa_settings_v1'
+};
+
+const SA_DEFAULT_THRESHOLD = 0.80;
+const SA_AUDIT_AUTO_THRESHOLD = 0.70;
+let saKbThreshold = SA_DEFAULT_THRESHOLD;
+let saAuditResultFilter = 'all';
+let saActiveAuditId = null;
+let saAuditModalFile = null;
+let saKbIndex = null;
+
+function saLoadJSON(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+function saSaveJSON(key, value) {
+  localStorage.setItem(key, JSON.stringify(value));
+}
+function saNowISO() { return new Date().toISOString(); }
+function saId(prefix) { return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now()}`; }
+function saClamp01(v) { return Math.max(0, Math.min(1, v)); }
+function saFmtPct(v) { return `${Math.round(v * 100)}%`; }
+
+function saEscapeHtml(s) {
+  return String(s ?? '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('\"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function saLoadSettings() {
+  const s = saLoadJSON(SA_STORAGE.SETTINGS, {});
+  if (typeof s.kbThreshold === 'number') saKbThreshold = s.kbThreshold;
+}
+function saSaveSettings() {
+  const s = saLoadJSON(SA_STORAGE.SETTINGS, {});
+  s.kbThreshold = saKbThreshold;
+  saSaveJSON(SA_STORAGE.SETTINGS, s);
+}
+
+function setKBThreshold(v) {
+  saKbThreshold = saClamp01(v);
+  const lbl = document.getElementById('kbThresholdLabel');
+  if (lbl) lbl.textContent = saKbThreshold.toFixed(2);
+  const slider = document.getElementById('kbThreshold');
+  if (slider && Number(slider.value) !== saKbThreshold) slider.value = String(saKbThreshold);
+  saSaveSettings();
+}
+
+function saDefaultKB() {
+  return [
+    { id: saId('kb'), question: 'Is multi-factor authentication enabled for privileged accounts?', answer: 'Yes. Multi-factor authentication is required for privileged accounts.', category: 'Access Control', createdAt: saNowISO() },
+    { id: saId('kb'), question: 'Are firewall logs monitored?', answer: 'Yes. Firewall logs are monitored and integrated into SIEM for correlation and alerting.', category: 'Logging & Monitoring', createdAt: saNowISO() },
+    { id: saId('kb'), question: 'Do you encrypt cardholder data at rest and in transit?', answer: 'Yes. Cardholder data is encrypted at rest using AES-256 and in transit using TLS 1.2+.', category: 'Encryption', createdAt: saNowISO() },
+    { id: saId('kb'), question: 'Do you conduct vulnerability assessment and penetration testing (VAPT) regularly?', answer: 'Yes. Vulnerability scans are performed regularly and penetration tests are conducted at least annually and after major changes.', category: 'Vulnerability Management', createdAt: saNowISO() }
+  ];
+}
+
+function kbGetAll() {
+  const kb = saLoadJSON(SA_STORAGE.KB, null);
+  if (Array.isArray(kb) && kb.length) return kb;
+  const seeded = saDefaultKB();
+  saSaveJSON(SA_STORAGE.KB, seeded);
+  return seeded;
+}
+function kbSetAll(entries) {
+  saSaveJSON(SA_STORAGE.KB, entries);
+  saKbIndex = null;
+}
+
+const SA_STOPWORDS = new Set([
+  'a','an','the','and','or','to','of','in','on','for','with','is','are','do','does','did','we','you','your','our','be','been','being',
+  'it','this','that','these','those','as','at','by','from','into','over','under','within','across','per','via','can','will','shall','should','may',
+  'provide','please','details','describe','explain'
+]);
+
+const SA_EXPANSIONS = [
+  [/\bmfa\b/g, 'multi factor authentication'],
+  [/\b2fa\b/g, 'two factor authentication'],
+  [/\bsiem\b/g, 'security information and event management'],
+  [/\bvapt\b/g, 'vulnerability assessment and penetration testing'],
+  [/\badmins?\b/g, 'administrator privileged'],
+  [/\badministrators?\b/g, 'administrator privileged'],
+  [/\bprivileged\b/g, 'administrator privileged'],
+  [/\bcardholder\b/g, 'card holder'],
+  [/\bfirewall logs\b/g, 'firewall log']
+];
+
+function saNormalizeForMatch(text) {
+  let s = String(text ?? '').toLowerCase();
+  for (const [re, rep] of SA_EXPANSIONS) s = s.replace(re, rep);
+  s = s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '');
+  s = s.replace(/[^a-z0-9]+/g, ' ').trim();
+  return s;
+}
+
+function saTokenize(text) {
+  const norm = saNormalizeForMatch(text);
+  if (!norm) return [];
+  return norm.split(/\s+/).filter(t => t && !SA_STOPWORDS.has(t) && t.length > 1);
+}
+
+function saBuildIndex(entries) {
+  const N = entries.length || 1;
+  const docs = entries.map(e => saTokenize(e.question));
+  const df = new Map();
+  for (const tokens of docs) {
+    const seen = new Set(tokens);
+    for (const t of seen) df.set(t, (df.get(t) || 0) + 1);
+  }
+  const idf = new Map();
+  for (const [t, d] of df.entries()) idf.set(t, Math.log((N + 1) / (d + 1)) + 1);
+
+  const vectors = new Map();
+  for (let i = 0; i < entries.length; i++) {
+    const tokens = docs[i];
+    const tf = new Map();
+    for (const t of tokens) tf.set(t, (tf.get(t) || 0) + 1);
+    const vec = new Map();
+    let norm = 0;
+    for (const [t, c] of tf.entries()) {
+      const w = (1 + Math.log(c)) * (idf.get(t) || 0);
+      if (!w) continue;
+      vec.set(t, w);
+      norm += w * w;
+    }
+    norm = Math.sqrt(norm) || 1;
+    vectors.set(entries[i].id, { vec, norm, tokens: new Set(tokens) });
+  }
+  return { idf, vectors };
+}
+
+function saCosine(aVec, aNorm, bVec, bNorm) {
+  let dot = 0;
+  const [small, big] = aVec.size <= bVec.size ? [aVec, bVec] : [bVec, aVec];
+  for (const [t, w] of small.entries()) {
+    const bw = big.get(t);
+    if (bw) dot += w * bw;
+  }
+  return dot / ((aNorm || 1) * (bNorm || 1));
+}
+
+function saVectorizeQuery(tokens, idf) {
+  const tf = new Map();
+  for (const t of tokens) tf.set(t, (tf.get(t) || 0) + 1);
+  const vec = new Map();
+  let norm = 0;
+  for (const [t, c] of tf.entries()) {
+    const w = (1 + Math.log(c)) * (idf.get(t) || 0);
+    if (!w) continue;
+    vec.set(t, w);
+    norm += w * w;
+  }
+  norm = Math.sqrt(norm) || 1;
+  return { vec, norm, tokens: new Set(tokens) };
+}
+
+function saBestKBMatch(question) {
+  const entries = kbGetAll();
+  if (!entries.length) return null;
+  if (!saKbIndex) saKbIndex = saBuildIndex(entries);
+  const qTokens = saTokenize(question);
+  const qV = saVectorizeQuery(qTokens, saKbIndex.idf);
+  let best = null;
+  for (const e of entries) {
+    const ev = saKbIndex.vectors.get(e.id);
+    if (!ev) continue;
+    const cos = saCosine(qV.vec, qV.norm, ev.vec, ev.norm);
+    let overlap = 0;
+    if (qV.tokens.size && ev.tokens.size) {
+      let common = 0;
+      for (const t of qV.tokens) if (ev.tokens.has(t)) common++;
+      overlap = common / Math.max(qV.tokens.size, ev.tokens.size);
+    }
+    const score = saClamp01(0.85 * cos + 0.15 * overlap);
+    if (!best || score > best.score) best = { entry: e, score };
+  }
+  return best;
+}
+
+// ── KB UI ──
+function kbOpenNew() {
+  document.getElementById('kbEntryId').value = '';
+  document.getElementById('kbEntryCategory').value = '';
+  document.getElementById('kbEntryQuestion').value = '';
+  document.getElementById('kbEntryAnswer').value = '';
+  document.getElementById('kbEntryStatus').textContent = 'Saved answers are used verbatim for Auto matches.';
+}
+
+function kbOpenEdit(id) {
+  const entries = kbGetAll();
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  document.getElementById('kbEntryId').value = e.id;
+  document.getElementById('kbEntryCategory').value = e.category || '';
+  document.getElementById('kbEntryQuestion').value = e.question || '';
+  document.getElementById('kbEntryAnswer').value = e.answer || '';
+  document.getElementById('kbEntryStatus').textContent = `Editing entry: ${id}`;
+  openModal('kbEntryModal');
+}
+
+function kbDelete(id) {
+  const entries = kbGetAll();
+  const e = entries.find(x => x.id === id);
+  if (!e) return;
+  if (!confirm('Delete this knowledge base entry?')) return;
+  kbSetAll(entries.filter(x => x.id !== id));
+  renderKB();
+}
+
+function kbDeleteFromModal() {
+  const id = document.getElementById('kbEntryId').value;
+  if (!id) { closeModal('kbEntryModal'); return; }
+  kbDelete(id);
+  closeModal('kbEntryModal');
+}
+
+function kbSaveFromModal() {
+  const id = document.getElementById('kbEntryId').value || saId('kb');
+  const category = document.getElementById('kbEntryCategory').value.trim();
+  const question = document.getElementById('kbEntryQuestion').value.trim();
+  const answer = document.getElementById('kbEntryAnswer').value.trim();
+
+  if (!question || !answer) {
+    document.getElementById('kbEntryStatus').textContent = 'Question and Answer are required.';
+    return;
+  }
+  const entries = kbGetAll();
+  const existingIdx = entries.findIndex(x => x.id === id);
+  const next = { id, category: category || null, question, answer, createdAt: existingIdx === -1 ? saNowISO() : entries[existingIdx].createdAt };
+  if (existingIdx === -1) entries.unshift(next);
+  else entries[existingIdx] = next;
+  kbSetAll(entries);
+  renderKB();
+  closeModal('kbEntryModal');
+}
+
+function kbExport() {
+  const entries = kbGetAll();
+  const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `knowledge_base_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+
+function saLoadScript(src) {
+  return new Promise((resolve) => {
+    const s = document.createElement('script');
+    s.src = src;
+    s.async = true;
+    s.onload = () => resolve(true);
+    s.onerror = () => resolve(false);
+    document.head.appendChild(s);
+  });
+}
+
+async function ensureXLSX() {
+  if (window.XLSX) return true;
+  return saLoadScript('https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js');
+}
+async function ensureMammoth() {
+  if (window.mammoth) return true;
+  return saLoadScript('https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js');
+}
+
+function saParseCSV(text) {
+  const rows = [];
+  let row = [];
+  let cur = '';
+  let inQ = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (inQ) {
+      if (c === '\"') {
+        if (text[i + 1] === '\"') { cur += '\"'; i++; }
+        else inQ = false;
+      } else cur += c;
+    } else {
+      if (c === '\"') inQ = true;
+      else if (c === ',') { row.push(cur); cur = ''; }
+      else if (c === '\\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c === '\\r') { /* ignore */ }
+      else cur += c;
+    }
+  }
+  row.push(cur);
+  rows.push(row);
+  return rows.map(r => r.map(x => String(x ?? '').trim()));
+}
+
+function saPickQuestionColumn(headerRow) {
+  const hdr = headerRow.map(h => saNormalizeForMatch(h));
+  const idx = hdr.findIndex(h => h === 'question' || h.includes('question'));
+  return idx >= 0 ? idx : 0;
+}
+
+function saExtractQuestionsFromRows(rows) {
+  const clean = rows.filter(r => r.some(c => String(c ?? '').trim()));
+  if (!clean.length) return [];
+  const qIdx = saPickQuestionColumn(clean[0]);
+  const start = qIdx === 0 ? 0 : 1;
+  const out = [];
+  for (let i = start; i < clean.length; i++) {
+    const v = (clean[i][qIdx] ?? '').toString().trim();
+    if (!v) continue;
+    out.push(v);
+  }
+  return [...new Set(out)];
+}
+
+function saAvgLen(cells) {
+  const xs = cells.map(x => String(x ?? '').trim()).filter(Boolean);
+  if (!xs.length) return 0;
+  return xs.reduce((a, s) => a + s.length, 0) / xs.length;
+}
+
+function saDetectHeaderRow(rows) {
+  const clean = rows.filter(r => r.some(c => String(c ?? '').trim()));
+  if (clean.length < 2) return false;
+  const r0 = clean[0].map(x => String(x ?? '').trim());
+  const r1 = clean[1].map(x => String(x ?? '').trim());
+  const h0 = r0.map(x => saNormalizeForMatch(x));
+
+  const keywordHit = h0.some(x => x === 'question' || x.includes('question') || x === 'answer' || x.includes('answer') || x.includes('category'));
+  if (keywordHit) return true;
+
+  const r0NonEmpty = r0.filter(Boolean);
+  const shortHeaderLike = r0NonEmpty.filter(x => x.length <= 28 && !/[?.:]/.test(x)).length;
+  const a0 = saAvgLen(r0);
+  const a1 = saAvgLen(r1);
+  if (r0NonEmpty.length >= 2 && shortHeaderLike >= Math.min(2, r0NonEmpty.length) && a0 > 0 && a0 < 22 && a1 >= (a0 + 10)) return true;
+  return false;
+}
+
+function saGuessKBColumnsFromData(rows, colCount) {
+  const sample = rows.slice(0, 30);
+  const questionPrefix = /^(do|does|did|is|are|what|how|when|where|why|provide|describe|explain|please)\b/i;
+  const cols = [];
+  for (let j = 0; j < colCount; j++) cols.push({ j, nonEmpty: 0, qmark: 0, qprefix: 0, totalLen: 0, uniq: new Set() });
+
+  for (const r of sample) {
+    for (let j = 0; j < colCount; j++) {
+      const v = String(r[j] ?? '').trim();
+      if (!v) continue;
+      const c = cols[j];
+      c.nonEmpty++;
+      c.totalLen += v.length;
+      c.uniq.add(v.slice(0, 120));
+      if (v.includes('?')) c.qmark++;
+      if (questionPrefix.test(v)) c.qprefix++;
+    }
+  }
+
+  const avgLen = (c) => c.nonEmpty ? (c.totalLen / c.nonEmpty) : 0;
+  const qScore = (c) => {
+    if (!c.nonEmpty) return -1;
+    const qm = c.qmark / c.nonEmpty;
+    const qp = c.qprefix / c.nonEmpty;
+    const al = avgLen(c);
+    const lenBonus = (al >= 10 && al <= 220) ? 0.3 : 0;
+    return (qm * 1.4 + qp * 0.9 + lenBonus) * (0.8 + Math.min(0.6, c.nonEmpty / 10));
+  };
+  const aScore = (c) => {
+    if (!c.nonEmpty) return -1;
+    const al = avgLen(c);
+    const sentencey = /[.;:]/;
+    const sent = [...c.uniq].filter(x => sentencey.test(x)).length / Math.max(1, c.uniq.size);
+    return (Math.min(2.2, al / 70) + sent * 0.6) * (0.8 + Math.min(0.6, c.nonEmpty / 10));
+  };
+
+  const qIdx = cols.slice().sort((a, b) => qScore(b) - qScore(a))[0]?.j ?? 0;
+  let aIdx = cols.filter(c => c.j !== qIdx).sort((a, b) => aScore(b) - aScore(a))[0]?.j;
+  if (aIdx === undefined) aIdx = qIdx === 0 ? 1 : 0;
+
+  const categoryCandidates = cols
+    .filter(c => c.j !== qIdx && c.j !== aIdx && c.nonEmpty)
+    .map(c => ({ j: c.j, al: avgLen(c), uniq: c.uniq.size, nonEmpty: c.nonEmpty }))
+    .filter(c => c.al > 0 && c.al <= 32 && c.uniq <= Math.min(40, c.nonEmpty + 3))
+    .sort((a, b) => a.al - b.al);
+  const cIdx = categoryCandidates[0]?.j ?? -1;
+
+  return { qIdx, aIdx, cIdx };
+}
+
+function saGuessKBImportSpec(rows) {
+  const clean = rows.filter(r => r.some(c => String(c ?? '').trim()));
+  if (!clean.length) throw new Error('Empty file.');
+  const colCount = clean.reduce((m, r) => Math.max(m, r.length), 0);
+  if (colCount < 2) throw new Error('Could not detect columns. Ensure at least 2 columns: Question and Answer.');
+
+  const hasHeader = saDetectHeaderRow(clean);
+  const startRow = hasHeader ? 1 : 0;
+  const header = hasHeader ? clean[0].map(x => saNormalizeForMatch(String(x ?? ''))) : [];
+  let qIdx = -1, aIdx = -1, cIdx = -1;
+
+  if (hasHeader) {
+    qIdx = header.findIndex(x => x === 'question' || x.includes('question'));
+    aIdx = header.findIndex(x => x === 'answer' || x.includes('answer') || x.includes('response') || x.includes('remediation'));
+    cIdx = header.findIndex(x => x.includes('category') || x.includes('domain') || x.includes('control'));
+  }
+
+  const guessed = saGuessKBColumnsFromData(clean.slice(startRow), colCount);
+  if (qIdx < 0) qIdx = guessed.qIdx;
+  if (aIdx < 0) aIdx = guessed.aIdx;
+  if (cIdx < 0) cIdx = guessed.cIdx;
+
+  if (qIdx === aIdx) aIdx = qIdx === 0 ? 1 : 0;
+  return { qIdx, aIdx, cIdx, startRow };
+}
+
+function saGuessQuestionsFromText(text) {
+  const lines = String(text ?? '').split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+  const candidates = [];
+  const isQuestiony = (s) => /\?$/.test(s) || /^(do|does|is|are|what|how|when|where|why|provide|describe|explain|please)\b/i.test(s);
+  for (const raw of lines) {
+    const s = raw.replace(/^[-•\u2022\u25CF\u25AA\u25A0\s]+/, '').replace(/^\d+[\).\-\s]+/, '').trim();
+    if (s.length < 8) continue;
+    if (isQuestiony(s)) candidates.push(s);
+  }
+  if (candidates.length) return [...new Set(candidates)];
+  const parts = String(text ?? '').split('?').map(p => p.trim()).filter(p => p.length > 12).map(p => p + '?');
+  return [...new Set(parts.slice(0, 200))];
+}
+
+async function extractQuestionsFromFile(file) {
+  const name = (file?.name || '').toLowerCase();
+  const ext = name.split('.').pop();
+  if (ext === 'csv') {
+    const text = await file.text();
+    return saExtractQuestionsFromRows(saParseCSV(text));
+  }
+  if (ext === 'json') {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (Array.isArray(data)) {
+      if (typeof data[0] === 'string') return [...new Set(data.map(s => String(s).trim()).filter(Boolean))];
+      if (typeof data[0] === 'object' && data[0]) {
+        return [...new Set(data.map(o => String(o.question || o.Question || '').trim()).filter(Boolean))];
+      }
+    }
+    throw new Error('Unsupported JSON format for audit upload.');
+  }
+  if (ext === 'xlsx' || ext === 'xls') {
+    const ok = await ensureXLSX();
+    if (!ok) throw new Error('XLSX parsing requires the xlsx library (CDN). Upload CSV instead, or open with internet access.');
+    const ab = await file.arrayBuffer();
+    const wb = XLSX.read(ab, { type: 'array' });
+    const sheet = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
+    return saExtractQuestionsFromRows(rows);
+  }
+  if (ext === 'docx') {
+    const ok = await ensureMammoth();
+    if (!ok) throw new Error('DOCX parsing requires the mammoth library (CDN). Upload CSV/XLSX instead, or open with internet access.');
+    const ab = await file.arrayBuffer();
+    const res = await mammoth.extractRawText({ arrayBuffer: ab });
+    return saGuessQuestionsFromText(res.value || '');
+  }
+  throw new Error('Unsupported file type. Use CSV, XLSX, DOCX, or JSON.');
+}
+
+function auditGetAll() { return saLoadJSON(SA_STORAGE.AUDITS, []); }
+function auditSetAll(audits) { saSaveJSON(SA_STORAGE.AUDITS, audits); }
+
+function auditMakeResults(questions) {
+  const out = [];
+  for (const q of questions) {
+    const best = saBestKBMatch(q);
+    if (!best || best.score < SA_AUDIT_AUTO_THRESHOLD) {
+      out.push({
+        question: q,
+        suggestedAnswer: 'No answer found in knowledge base. Manual response required.',
+        confidence: best ? best.score : 0,
+        sourceQuestion: best ? best.entry.question : '',
+        status: 'Manual'
+      });
+    } else {
+      out.push({
+        question: q,
+        suggestedAnswer: best.entry.answer,
+        confidence: best.score,
+        sourceQuestion: best.entry.question,
+        status: 'Auto'
+      });
+    }
+  }
+  return out;
+}
+
+async function handleAuditFileSelect(file) {
+  if (!file) return;
+  try {
+    const questions = await extractQuestionsFromFile(file);
+    if (!questions.length) throw new Error('No questions found in the uploaded file.');
+    const audit = {
+      id: saId('audit'),
+      fileName: file.name,
+      createdAt: saNowISO(),
+      questions,
+      results: auditMakeResults(questions)
+    };
+    const all = auditGetAll();
+    all.unshift(audit);
+    auditSetAll(all);
+    saActiveAuditId = audit.id;
+    renderAuditList();
+    renderAuditResults();
+    navTo('audit');
+    const hint = document.getElementById('auditUploadHint');
+    if (hint) hint.textContent = `Processed ${questions.length} questions from ${file.name}.`;
+  } catch (e) {
+    alert(e?.message || String(e));
+  }
+}
+
+function auditModalSelectFile(file) {
+  saAuditModalFile = file || null;
+  const status = document.getElementById('auditModalStatus');
+  if (status) status.textContent = saAuditModalFile ? `Selected: ${saAuditModalFile.name}` : 'No file selected.';
+}
+
+function processAuditFromModal() {
+  if (!saAuditModalFile) {
+    const status = document.getElementById('auditModalStatus');
+    if (status) status.textContent = 'Select a file first.';
+    return;
+  }
+  closeModal('uploadModal');
+  const f = saAuditModalFile;
+  saAuditModalFile = null;
+  auditModalSelectFile(null);
+  handleAuditFileSelect(f);
+}
+
+function triggerAuditPick() {
+  const el = document.getElementById('auditUploadInput');
+  if (el) el.click();
+}
+
+function setAuditResultFilter(f, btn) {
+  saAuditResultFilter = f;
+  document.querySelectorAll('#tab-audit .filters .fb').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderAuditResults();
+}
+
+function renderAuditList() {
+  const list = document.getElementById('auditList');
+  if (!list) return;
+  const audits = auditGetAll();
+  if (!audits.length) {
+    list.innerHTML = '<div class=\"hint\">No uploads yet.</div>';
+    return;
+  }
+  list.innerHTML = audits.slice(0, 12).map(a => {
+    const auto = a.results?.filter(r => r.status === 'Auto').length || 0;
+    const manual = a.results?.filter(r => r.status === 'Manual').length || 0;
+    const active = a.id === saActiveAuditId;
+    return `
+      <div class="card-xs" style="cursor:pointer;border-color:${active ? 'rgba(59,130,246,.35)' : 'var(--border)'}" onclick="auditOpen('${a.id}')">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <span style="font-size:12px;font-weight:600">${saEscapeHtml(a.fileName)}</span>
+          <span class="badge ${active ? 'b-blue' : 'b-gray'}">${active ? 'Active' : 'Saved'}</span>
+        </div>
+        <div class="hint">${new Date(a.createdAt).toLocaleString()}</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <span class="badge b-green">${auto} Auto</span>
+          <span class="badge b-amber">${manual} Manual</span>
+          <span class="badge b-gray">${a.questions?.length || 0} Qs</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function auditOpen(id) {
+  saActiveAuditId = id;
+  renderAuditList();
+  renderAuditResults();
+}
+
+function renderAuditResults() {
+  const tbl = document.querySelector('#auditResultsTable tbody');
+  const label = document.getElementById('auditActiveLabel');
+  if (!tbl || !label) return;
+
+  const audits = auditGetAll();
+  const audit = audits.find(a => a.id === saActiveAuditId);
+  if (!audit) {
+    label.textContent = 'No audit selected.';
+    tbl.innerHTML = '';
+    return;
+  }
+  label.textContent = `Active audit: ${audit.fileName} · ${audit.results.length} questions`;
+  const rows = audit.results.filter(r => saAuditResultFilter === 'all' ? true : r.status.toLowerCase() === saAuditResultFilter);
+  tbl.innerHTML = rows.map(r => {
+    const badge = r.status === 'Auto' ? 'b-green' : 'b-amber';
+    return `<tr>
+      <td style="color:var(--text2)">${saEscapeHtml(r.question)}</td>
+      <td>${saEscapeHtml(r.suggestedAnswer)}</td>
+      <td style="font-family:var(--mono);color:${r.confidence >= SA_AUDIT_AUTO_THRESHOLD ? 'var(--green3)' : 'var(--amber3)'}">${saFmtPct(r.confidence)}</td>
+      <td style="color:var(--text2)">${saEscapeHtml(r.sourceQuestion || '')}</td>
+      <td><span class="badge ${badge}">${r.status}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function downloadAuditTemplate() {
+  const csv = [
+    'Question',
+    'Is multi-factor authentication enabled for privileged accounts?',
+    'Are firewall logs monitored?',
+    'Do you encrypt cardholder data at rest and in transit?'
+  ].join('\\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'audit_questionnaire_template.csv';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+
+// ── Chat ──
+function chatGetAll() { return saLoadJSON(SA_STORAGE.CHAT, []); }
+function chatSetAll(items) { saSaveJSON(SA_STORAGE.CHAT, items); }
+
+function chatAppend(role, text, meta) {
+  const log = document.getElementById('chatLog');
+  if (!log) return;
+  const bubble = document.createElement('div');
+  bubble.className = `chat-bubble ${role}`;
+  bubble.innerHTML = saEscapeHtml(text).replaceAll('\\n', '<br>');
+  if (meta) {
+    const m = document.createElement('div');
+    m.className = 'chat-meta';
+    m.textContent = meta;
+    bubble.appendChild(m);
+  }
+  log.appendChild(bubble);
+  log.scrollTop = log.scrollHeight;
+}
+
+function chatQuick(q) {
+  const i = document.getElementById('chatInput');
+  if (i) i.value = q;
+  sendChat();
+}
+
+function sendChat() {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  const q = input.value.trim();
+  if (!q) return;
+  input.value = '';
+  chatAppend('user', q);
+
+  const best = saBestKBMatch(q);
+  let answer, meta, last;
+  if (!best || best.score < saKbThreshold) {
+    answer = 'No answer found in knowledge base. Manual response required.';
+    meta = best ? `Matched: ${best.entry.question} · Confidence: ${best.score.toFixed(2)}` : `Confidence: 0.00`;
+    last = { question: q, answer, confidence: best ? best.score : 0, sourceQuestion: best ? best.entry.question : null, status: 'Manual', createdAt: saNowISO() };
+  } else {
+    answer = best.entry.answer;
+    meta = `Matched: ${best.entry.question} · Confidence: ${best.score.toFixed(2)}`;
+    last = { question: q, answer, confidence: best.score, sourceQuestion: best.entry.question, status: 'Auto', createdAt: saNowISO() };
+  }
+  chatAppend('bot', answer, meta);
+
+  const box = document.getElementById('chatLastMatch');
+  if (box) box.textContent = meta;
+
+  const hist = chatGetAll();
+  hist.push(last);
+  chatSetAll(hist.slice(-300));
+}
+
+function chatClear() {
+  if (!confirm('Clear chat history?')) return;
+  chatSetAll([]);
+  const log = document.getElementById('chatLog');
+  if (log) log.innerHTML = '';
+  const box = document.getElementById('chatLastMatch');
+  if (box) box.textContent = 'No queries yet.';
+}
+
+function chatExport() {
+  const hist = chatGetAll();
+  const blob = new Blob([JSON.stringify(hist, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `chat_history_${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+}
+
+function renderKB() {
+  const tableBody = document.querySelector('#kbTable tbody');
+  const filter = document.getElementById('kbCategoryFilter');
+  const search = document.getElementById('kbSearch');
+  const badge = document.getElementById('kbCountBadge');
+  if (!tableBody || !filter || !search || !badge) return;
+
+  const entries = kbGetAll();
+  const q = saNormalizeForMatch(search.value || '');
+  const category = filter.value || 'all';
+
+  const cats = [...new Set(entries.map(e => e.category).filter(Boolean))].sort((a,b) => a.localeCompare(b));
+  const prev = filter.value;
+  filter.innerHTML = `<option value="all">All categories</option>` + cats.map(c => `<option value="${saEscapeHtml(c)}">${saEscapeHtml(c)}</option>`).join('');
+  if (prev && cats.includes(prev)) filter.value = prev;
+
+  const rows = entries.filter(e => {
+    if (category !== 'all' && (e.category || '') !== category) return false;
+    if (!q) return true;
+    return saNormalizeForMatch(e.question).includes(q) || saNormalizeForMatch(e.answer).includes(q) || saNormalizeForMatch(e.category || '').includes(q);
+  });
+
+  badge.textContent = `${rows.length} entries`;
+  tableBody.innerHTML = rows.map(e => {
+    const cat = e.category || '—';
+    return `<tr>
+      <td style="color:var(--text2)">${saEscapeHtml(e.question)}</td>
+      <td>${saEscapeHtml(e.answer)}</td>
+      <td style="font-family:var(--mono);color:var(--text2)">${saEscapeHtml(cat)}</td>
+      <td>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button class="mini-btn primary" onclick="kbOpenEdit('${e.id}')">Edit</button>
+          <button class="mini-btn danger" onclick="kbDelete('${e.id}')">Delete</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+async function kbImportFromFile(file) {
+  if (!file) return;
+  try {
+    const name = (file.name || '').toLowerCase();
+    const ext = name.split('.').pop();
+    let imported = [];
+    if (ext === 'json') {
+      const data = JSON.parse(await file.text());
+      if (!Array.isArray(data)) throw new Error('JSON must be an array of {question, answer, category}.');
+      imported = data.map(o => ({
+        id: saId('kb'),
+        question: String(o.question || o.Question || '').trim(),
+        answer: String(o.answer || o.Answer || '').trim(),
+        category: String(o.category || o.Category || '').trim() || null,
+        createdAt: saNowISO()
+      })).filter(x => x.question && x.answer);
+    } else if (ext === 'csv') {
+      const rows = saParseCSV(await file.text());
+      if (!rows.length) throw new Error('Empty CSV.');
+      const { qIdx, aIdx, cIdx, startRow } = saGuessKBImportSpec(rows);
+      for (let i = startRow; i < rows.length; i++) {
+        const r = rows[i];
+        const q = (r[qIdx] || '').trim();
+        const a = (r[aIdx] || '').trim();
+        const c = (cIdx >= 0 ? (r[cIdx] || '').trim() : '') || null;
+        if (q && a) imported.push({ id: saId('kb'), question: q, answer: a, category: c, createdAt: saNowISO() });
+      }
+    } else if (ext === 'xlsx' || ext === 'xls') {
+      const ok = await ensureXLSX();
+      if (!ok) throw new Error('XLSX import requires the xlsx library (CDN). Import JSON/CSV instead.');
+      const ab = await file.arrayBuffer();
+      const wb = XLSX.read(ab, { type: 'array' });
+      const sheet = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: false });
+      if (!rows.length) throw new Error('Empty XLSX.');
+      const normRows = rows.map(r => (r || []).map(x => String(x ?? '').trim()));
+      const { qIdx, aIdx, cIdx, startRow } = saGuessKBImportSpec(normRows);
+      for (let i = startRow; i < normRows.length; i++) {
+        const r = rows[i] || [];
+        const q = String(r[qIdx] ?? '').trim();
+        const a = String(r[aIdx] ?? '').trim();
+        const c = (cIdx >= 0 ? String(r[cIdx] ?? '').trim() : '') || null;
+        if (q && a) imported.push({ id: saId('kb'), question: q, answer: a, category: c, createdAt: saNowISO() });
+      }
+    } else {
+      throw new Error('Unsupported KB import file type. Use JSON, CSV, or XLSX.');
+    }
+
+    if (!imported.length) throw new Error('No valid KB entries found to import.');
+    const existing = kbGetAll();
+    kbSetAll([...imported, ...existing]);
+    renderKB();
+    alert(`Imported ${imported.length} knowledge base entries.`);
+  } catch (e) {
+    alert(e?.message || String(e));
+  }
+}
+
+function navTo(id) {
+  const btn = Array.from(document.querySelectorAll('.nav-btn')).find(b => b.getAttribute('onclick')?.includes(`nav('${id}'`));
+  if (btn) nav(id, btn);
+  else document.getElementById('tab-' + id)?.classList.add('active');
+}
+
+function saInitAssistant() {
+  saLoadSettings();
+  setKBThreshold(saKbThreshold);
+  renderKB();
+  renderAuditList();
+  renderAuditResults();
+
+  const hist = chatGetAll();
+  const log = document.getElementById('chatLog');
+  if (log && hist.length) {
+    log.innerHTML = '';
+    for (const it of hist.slice(-40)) {
+      chatAppend('user', it.question);
+      chatAppend('bot', it.answer, `Matched: ${it.sourceQuestion || '—'} · Confidence: ${(it.confidence || 0).toFixed(2)}`);
+    }
+    log.scrollTop = log.scrollHeight;
+  }
+}
 
 // ── CHARTS ──
 let chartsInit = false;
@@ -1383,6 +2403,7 @@ function buildHeatmap() {
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
   document.title = 'SecureAudit RAG v2 — ' + now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+  saInitAssistant();
 });
 </script>
 </body>

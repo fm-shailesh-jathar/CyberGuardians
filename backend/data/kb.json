@@ -1,0 +1,730 @@
+[
+  {
+    "id": "kb_ede3cf6f3444f8_1773668861493",
+    "question": "Is a firewall installed between the internet and the cardholder data environment (CDE)?",
+    "answer": "Yes, firewalls are deployed to restrict unauthorized traffic between the internet and CDE.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_186f6ce0f8dd2_1773668861493",
+    "question": "Are firewall rules reviewed regularly?",
+    "answer": "Yes, firewall rules are reviewed at least every six months.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_6d8eff75a6f15_1773668861493",
+    "question": "Is network segmentation implemented?",
+    "answer": "Yes, the CDE is segmented using VLANs, subnets, and security groups.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_c11504e8096078_1773668861493",
+    "question": "How is network segmentation implemented in AWS?",
+    "answer": "Using VPCs, security groups, and network ACLs.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_652ee7c551c81_1773668861493",
+    "question": "Are default passwords removed from network devices?",
+    "answer": "Yes, default credentials are changed during deployment.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_9682b456f2c93_1773668861493",
+    "question": "Is inbound traffic restricted to required ports?",
+    "answer": "Yes, only necessary ports are allowed.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_e744fc722372c_1773668861493",
+    "question": "Are firewall logs monitored?",
+    "answer": "Yes, logs are collected and monitored via SIEM.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_6266f63ccb4cb8_1773668861493",
+    "question": "Are routers configured securely?",
+    "answer": "Yes, routers follow secure configuration baselines.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ed069ee3cb3758_1773668861493",
+    "question": "Is network traffic monitored for anomalies?",
+    "answer": "Yes, IDS/IPS solutions monitor traffic.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_8e91ee24250018_1773668861493",
+    "question": "Is public access restricted for internal systems?",
+    "answer": "Yes, internal systems are not directly accessible from the internet.",
+    "category": "Network Security",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_6b15d492b2acb8_1773668861493",
+    "question": "Are system hardening standards applied?",
+    "answer": "Yes, CIS benchmarks are followed.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_55180bcee854a8_1773668861493",
+    "question": "Are unnecessary services disabled?",
+    "answer": "Yes, only required services are enabled.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_d4303454248bb8_1773668861493",
+    "question": "Are default accounts removed?",
+    "answer": "Yes, default accounts are disabled or renamed.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_1d039bc3e91a4_1773668861493",
+    "question": "Are OS patches regularly applied?",
+    "answer": "Yes, patch management runs monthly or earlier for critical patches.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ae8012d0993c58_1773668861493",
+    "question": "Are AWS instances hardened?",
+    "answer": "Yes, hardened AMIs are used.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_33f4a7c1105bd_1773668861493",
+    "question": "Is configuration management automated?",
+    "answer": "Yes, tools like Ansible or Terraform are used.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_71ec59d6cf0088_1773668861493",
+    "question": "Are configuration changes tracked?",
+    "answer": "Yes, through version control and audit logs.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_f1405c584f0e98_1773668861493",
+    "question": "Are baseline images used?",
+    "answer": "Yes, standardized hardened images are deployed.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_042378f9617a5_1773668861493",
+    "question": "Are container images scanned?",
+    "answer": "Yes, vulnerability scanning tools are used.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_f7d27445d6c96_1773668861493",
+    "question": "Are misconfigurations monitored?",
+    "answer": "Yes, AWS Config rules monitor configuration drift.",
+    "category": "Secure Configuration",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_7004db074f2ce8_1773668861493",
+    "question": "Is cardholder data encrypted at rest?",
+    "answer": "Yes, encryption is implemented using AES‑256.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_4fc51390ca1d5_1773668861493",
+    "question": "Is data encrypted in transit?",
+    "answer": "Yes, TLS 1.2 or higher is used.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_536f7c594e7748_1773668861493",
+    "question": "Are encryption keys protected?",
+    "answer": "Yes, keys are managed using AWS KMS or HSM.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_839ee2ffd907c8_1773668861493",
+    "question": "Is tokenization implemented?",
+    "answer": "Yes, sensitive card data is tokenized.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_373639ef0e2b58_1773668861493",
+    "question": "Are backups encrypted?",
+    "answer": "Yes, backup data is encrypted.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_320ced00eb7fc8_1773668861493",
+    "question": "Are database connections secure?",
+    "answer": "Yes, SSL connections are enforced.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_587d3f3b4ad42_1773668861493",
+    "question": "Are encryption keys rotated?",
+    "answer": "Yes, keys are rotated periodically.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ee8fca91bcac78_1773668861493",
+    "question": "Is sensitive data masked in logs?",
+    "answer": "Yes, PAN data is masked.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_2f70563344603_1773668861493",
+    "question": "Is data retention defined?",
+    "answer": "Yes, retention policies are documented.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_feb41d429b6c58_1773668861493",
+    "question": "Is card data storage minimized?",
+    "answer": "Yes, only required data is stored.",
+    "category": "Data Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_43c4b718ee4ef8_1773668861493",
+    "question": "Is access based on least privilege?",
+    "answer": "Yes, users receive minimal permissions.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_3bf0de123f439_1773668861493",
+    "question": "Is multi‑factor authentication enabled?",
+    "answer": "Yes, MFA is required.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_07343fe20f394_1773668861493",
+    "question": "Are IAM roles used instead of static credentials?",
+    "answer": "Yes, IAM roles are preferred.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_8aabe27edc95b8_1773668861493",
+    "question": "Are user accounts reviewed periodically?",
+    "answer": "Yes, access reviews occur quarterly.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_e71bd9c7a70e7_1773668861493",
+    "question": "Are shared accounts prohibited?",
+    "answer": "Yes, individual accounts are used.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_99d2a286b9142_1773668861493",
+    "question": "Are privileged accounts monitored?",
+    "answer": "Yes, privileged access is logged.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_837f90262022b_1773668861493",
+    "question": "Are inactive accounts disabled?",
+    "answer": "Yes, accounts inactive for 90 days are disabled.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_03381bdae9b33_1773668861493",
+    "question": "Is SSH access restricted?",
+    "answer": "Yes, restricted via key‑based authentication.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_0fea6cdfdbdd3_1773668861493",
+    "question": "Are password policies enforced?",
+    "answer": "Yes, strong password policies are applied.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_c22fe256fae76_1773668861493",
+    "question": "Is access revoked immediately when employees leave?",
+    "answer": "Yes, offboarding procedures remove access.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_0ce7324b3bb758_1773668861493",
+    "question": "Are system logs enabled?",
+    "answer": "Yes, logging is enabled for all critical systems.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_716d098f73c0a_1773668861493",
+    "question": "Are logs centralized?",
+    "answer": "Yes, logs are forwarded to a SIEM platform.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_c13dba8d901bb8_1773668861493",
+    "question": "Are AWS logs enabled?",
+    "answer": "Yes, CloudTrail and VPC Flow Logs are enabled.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_1f69135ed6e4e8_1773668861493",
+    "question": "Are log retention policies defined?",
+    "answer": "Yes, logs are retained for at least one year.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ebd3aee2d2ed5_1773668861493",
+    "question": "Are security alerts generated?",
+    "answer": "Yes, alerts trigger incident response.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_db7ab51e1fe0b_1773668861493",
+    "question": "Are log reviews conducted?",
+    "answer": "Yes, logs are reviewed daily.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_f47687e41f0de8_1773668861493",
+    "question": "Are unauthorized access attempts logged?",
+    "answer": "Yes, all authentication events are logged.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_c2ef48cbd6fd58_1773668861493",
+    "question": "Are time synchronization controls implemented?",
+    "answer": "Yes, NTP servers synchronize system clocks.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_2c45c93c65dac_1773668861493",
+    "question": "Are audit logs protected from modification?",
+    "answer": "Yes, logs are stored securely.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_f9e190dcd1cfb_1773668861493",
+    "question": "Are logs monitored for anomalies?",
+    "answer": "Yes, SIEM rules detect unusual patterns.",
+    "category": "Monitoring & Logging",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_9ff5afa2cc21b8_1773668861493",
+    "question": "Are vulnerability scans performed regularly?",
+    "answer": "Yes, scans occur quarterly.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ff57564d7facb_1773668861493",
+    "question": "Are critical vulnerabilities remediated quickly?",
+    "answer": "Yes, within defined SLAs.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_56af2a0fdb3788_1773668861493",
+    "question": "Are external scans performed?",
+    "answer": "Yes, by approved scanning vendors.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_9910e07991623_1773668861493",
+    "question": "Are internal scans conducted?",
+    "answer": "Yes, internal scanning tools are used.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_990473ae3d8cd_1773668861493",
+    "question": "Are container images scanned for vulnerabilities?",
+    "answer": "Yes, automated scanning tools are used.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_64c0635a5a60c8_1773668861493",
+    "question": "Is patch management implemented?",
+    "answer": "Yes, patches are applied regularly.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_46d939b5c34838_1773668861493",
+    "question": "Are vulnerability reports tracked?",
+    "answer": "Yes, remediation is tracked in ticketing systems.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_3035e663d601e_1773668861493",
+    "question": "Are security updates prioritized?",
+    "answer": "Yes, based on severity.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_4e4a42b5dd5ce_1773668861493",
+    "question": "Are outdated systems upgraded?",
+    "answer": "Yes, unsupported software is replaced.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_280b0bf332c498_1773668861493",
+    "question": "Are security scans documented?",
+    "answer": "Yes, reports are maintained for audits.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_58d6ed01f4817_1773668861493",
+    "question": "Is antivirus installed on endpoints?",
+    "answer": "Yes, endpoint protection software is deployed.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_7ed7e1a4082df_1773668861493",
+    "question": "Are malware definitions updated?",
+    "answer": "Yes, updates are automatic.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_e5e46a7f38fe28_1773668861493",
+    "question": "Are real‑time scans enabled?",
+    "answer": "Yes, real‑time protection is active.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ea519fcf54695_1773668861493",
+    "question": "Are servers protected against malware?",
+    "answer": "Yes, server security agents are installed.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_ebf16e1a05af_1773668861493",
+    "question": "Are malicious files quarantined automatically?",
+    "answer": "Yes, infected files are isolated.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_4e4d9ee66ba268_1773668861493",
+    "question": "Are email attachments scanned?",
+    "answer": "Yes, email security gateways scan attachments.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_f5f4df174ea508_1773668861493",
+    "question": "Are suspicious downloads blocked?",
+    "answer": "Yes, endpoint security tools block them.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_dfe3e3af71fdd_1773668861493",
+    "question": "Are malware incidents tracked?",
+    "answer": "Yes, incidents are logged and investigated.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_7c1abd5c577ce8_1773668861493",
+    "question": "Are USB devices restricted?",
+    "answer": "Yes, removable media policies are enforced.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_a3d0e7f13b812_1773668861493",
+    "question": "Are malware alerts monitored?",
+    "answer": "Yes, SOC teams monitor alerts.",
+    "category": "Malware Protection",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_216083ed5752b_1773668861493",
+    "question": "Is secure coding practiced?",
+    "answer": "Yes, developers follow secure coding guidelines.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_e32649b76e0cf8_1773668861493",
+    "question": "Are code reviews conducted?",
+    "answer": "Yes, peer reviews are mandatory.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_38ef3511ab2188_1773668861493",
+    "question": "Are applications tested for vulnerabilities?",
+    "answer": "Yes, SAST and DAST tools are used.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_d4673b26c1b738_1773668861493",
+    "question": "Are dependencies scanned?",
+    "answer": "Yes, dependency scanning tools identify risks.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_c165046a460fc_1773668861493",
+    "question": "Are secrets stored securely?",
+    "answer": "Yes, secrets management tools are used.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_bec0885be5911_1773668861493",
+    "question": "Are APIs protected?",
+    "answer": "Yes, APIs require authentication.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_58bc6b523e2cc_1773668861493",
+    "question": "Are security tests integrated in CI/CD?",
+    "answer": "Yes, pipelines include security scans.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_b0005a3408084_1773668861493",
+    "question": "Are software updates tested before deployment?",
+    "answer": "Yes, staging environments are used.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_1deead72a92d4_1773668861493",
+    "question": "Are vulnerabilities tracked?",
+    "answer": "Yes, issues are tracked in ticket systems.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_fbcb52644913d_1773668861493",
+    "question": "Are production deployments controlled?",
+    "answer": "Yes, change management processes apply.",
+    "category": "Secure Development",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_62f84eea568878_1773668861493",
+    "question": "Is an incident response plan documented?",
+    "answer": "Yes, the organization maintains a response plan.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_75ccf21ac07488_1773668861493",
+    "question": "Are security incidents reported immediately?",
+    "answer": "Yes, incidents are reported promptly.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_26d939b78b3dc_1773668861493",
+    "question": "Is an incident response team assigned?",
+    "answer": "Yes, a dedicated team handles incidents.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_832169bbd95908_1773668861493",
+    "question": "Are incidents documented?",
+    "answer": "Yes, incident records are maintained.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_c1bd8b5198597_1773668861493",
+    "question": "Are forensic investigations supported?",
+    "answer": "Yes, forensic procedures are defined.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_556142ae897fd_1773668861493",
+    "question": "Are breach notifications defined?",
+    "answer": "Yes, notification procedures follow regulatory guidelines.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_0a331cecddfee8_1773668861493",
+    "question": "Are incident response drills conducted?",
+    "answer": "Yes, exercises occur annually.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_1c1e2cd2970ff8_1773668861493",
+    "question": "Are lessons learned documented?",
+    "answer": "Yes, post‑incident reviews occur.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_134af20ebfae68_1773668861493",
+    "question": "Are incidents tracked?",
+    "answer": "Yes, ticketing systems track response progress.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_0fd331d18b71f8_1773668861493",
+    "question": "Are incident reports stored securely?",
+    "answer": "Yes, reports are protected.",
+    "category": "Incident Response",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_35ae838caa6d58_1773668861493",
+    "question": "Are information security policies documented?",
+    "answer": "Yes, policies are maintained and reviewed annually.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_7c14b66c427178_1773668861493",
+    "question": "Are employees trained in security awareness?",
+    "answer": "Yes, training is conducted annually.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_d49ffcd370b5c8_1773668861493",
+    "question": "Are vendors assessed for security compliance?",
+    "answer": "Yes, vendor risk assessments are conducted.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_2cc2732910d4e8_1773668861493",
+    "question": "Are data classification policies defined?",
+    "answer": "Yes, data classification standards exist.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_8cf0ef4b60b678_1773668861493",
+    "question": "Are acceptable use policies enforced?",
+    "answer": "Yes, employees must follow them.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_4229de3c151d88_1773668861493",
+    "question": "Are background checks performed for employees?",
+    "answer": "Yes, checks are conducted before hiring.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_0d43605012a888_1773668861493",
+    "question": "Are security responsibilities defined?",
+    "answer": "Yes, roles and responsibilities are documented.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_d6426c16b15738_1773668861493",
+    "question": "Are policy exceptions documented?",
+    "answer": "Yes, exceptions require approval.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_b851c3e26227c8_1773668861493",
+    "question": "Are security policies reviewed regularly?",
+    "answer": "Yes, policies are reviewed annually.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_e5fb3df7e84a38_1773668861493",
+    "question": "Is compliance with security policies monitored?",
+    "answer": "Yes, internal audits verify compliance.",
+    "category": "Security Policies",
+    "createdAt": "2026-03-16T13:47:41.493Z"
+  },
+  {
+    "id": "kb_881eb9d88a2228_1773668776672",
+    "question": "Is multi-factor authentication enabled for privileged accounts?",
+    "answer": "Yes. Multi-factor authentication is required for privileged accounts.",
+    "category": "Access Control",
+    "createdAt": "2026-03-16T13:46:16.672Z"
+  },
+  {
+    "id": "kb_71f557c76b5d18_1773668776672",
+    "question": "Are firewall logs monitored?",
+    "answer": "Yes. Firewall logs are monitored and integrated into SIEM for correlation and alerting.",
+    "category": "Logging & Monitoring",
+    "createdAt": "2026-03-16T13:46:16.672Z"
+  },
+  {
+    "id": "kb_c042c38b48c55_1773668776672",
+    "question": "Do you encrypt cardholder data at rest and in transit?",
+    "answer": "Yes. Cardholder data is encrypted at rest using AES-256 and in transit using TLS 1.2+.",
+    "category": "Encryption",
+    "createdAt": "2026-03-16T13:46:16.672Z"
+  },
+  {
+    "id": "kb_68a993cc37c1d_1773668776672",
+    "question": "Do you conduct vulnerability assessment and penetration testing (VAPT) regularly?",
+    "answer": "Yes. Vulnerability scans are performed regularly and penetration tests are conducted at least annually and after major changes.",
+    "category": "Vulnerability Management",
+    "createdAt": "2026-03-16T13:46:16.672Z"
+  }
+]
