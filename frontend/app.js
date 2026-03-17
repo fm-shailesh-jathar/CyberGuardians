@@ -1016,41 +1016,45 @@ async function auditExportFilled() {
   if (saAuditEditing) return alert('Finish editing first, then export.');
 
   const filledRows = auditBuildFilledOriginalRows(audit);
-  if (!filledRows) return alert('Unable to build filled file from the original upload.');
+  if (!filledRows || !filledRows.length) return alert('Unable to build filled file from the original upload. Please upload CSV/XLSX and ensure questions are present.');
 
   const name = String(audit.fileName || 'audit').trim() || 'audit';
   const dot = name.lastIndexOf('.');
   const base = (dot > 0 ? name.slice(0, dot) : name).replace(/[\\/:*?"<>|]+/g, '_');
   const origExt = (audit.original?.ext || '').toLowerCase();
 
+  const download = (blob, filename) => {
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  };
+
   if (origExt === 'xlsx') {
     const ok = await ensureXLSX();
-    if (ok) {
-      const ws = XLSX.utils.aoa_to_sheet(filledRows);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, audit.original?.sheetName || 'Sheet1');
-      const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-      const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `${base}_filled.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1500);
-      return;
+    if (ok && window.XLSX) {
+      try {
+        const ws = XLSX.utils.aoa_to_sheet(filledRows);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, audit.original?.sheetName || 'Sheet1');
+        const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        download(blob, `${base}_filled.xlsx`);
+        return;
+      } catch (e) {
+        console.error('XLSX export failed:', e);
+      }
+    } else {
+      alert('Could not load XLSX export library. Exporting CSV instead.');
     }
   }
 
   const csv = saToCSV(filledRows);
   const blob = new Blob([csv], { type: 'text/csv' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `${base}_filled.csv`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1500);
+  download(blob, `${base}_filled.csv`);
 }
 
 function auditDelete(id, ev) {

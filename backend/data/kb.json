@@ -1,5 +1,523 @@
 [
   {
+    "id": "kb_00d1ca881551e_1773746099242",
+    "question": "The ISP must be formally approved by the board or management, and a review schedule should be documented. The review cycle should include annual or event-triggered assessments and ensure alignment with regulatory or PCI requirements or industry best practices.",
+    "answer": "A signed copy of the ISP, meeting minutes or board approval documentation, and a documented review schedule",
+    "category": "Governance, Risk, and Compliance",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_bed1dff99f2748_1773746099242",
+    "question": "Review the risk register for open items, verify timely follow-up, and ensure mgmt or board-level sign-off for high-risk acceptances.",
+    "answer": "Risk register/GRC tool, assigned owners, due dates, risk acceptance forms, mgmt or board approvals",
+    "category": "Governance, Risk, and Compliance",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_06131d7026ae58_1773746099242",
+    "question": "Verify security questionnaires, on-site visits, and certifications. Best Practice: Schedule regular updates.",
+    "answer": "Vendor due diligence forms, site visit reports, ISO 27001/PCI AoC documents",
+    "category": "Sub Contractor",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_70ea8390503af_1773746099242",
+    "question": "Examine contracts for clear data ownership, SLA metrics, breach notifications, and audit rights. Best Practice: Update as regulatory needs evolve.",
+    "answer": "Vendor contracts/MSAs with data clauses, SLA terms, and audit addenda.",
+    "category": "Sub Contractor",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_b7e29f823674_1773746099242",
+    "question": "Verify KPI dashboards, audit reports, encryption standards, and data purging logs. Best Practice: Utilize SIEM tools and automated alerts.",
+    "answer": "Vendor KPI reports, performance stats, encryption evidence, data purging logs, and retention policy documents.",
+    "category": "Sub Contractor",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_2b1865d82034c_1773746099242",
+    "question": "Confirm that MFA is enforced for all administrative access, verify that privileged actions such as configuration changes are logged and regularly reviewed, and ensure that privileged roles are re-certified on a quarterly or semi-annual basis.",
+    "answer": "The evidence includes MFA configuration documentation, administrative login and action logs, and role re-certification records along with meeting minutes.",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_56609395344f7_1773746099242",
+    "question": "Verify that remote connections are established using a VPN with TLS/IPSec, with enforced session timeouts and MFA; ensure that remote endpoints undergo security compliance checks, conditional access policies are in place, and remote access logs are integrated with SIEM for real-time monitoring. Also, confirm that any new remote access requests have formal approvals and conduct periodic reviews of remote user access.",
+    "answer": "The evidence includes VPN configuration documents, remote session logs, MFA tool usage logs, endpoint security compliance reports, conditional access policy documentation, and remote access request forms and periodic access review records.",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_46c59e777aad2_1773746099242",
+    "question": "Verify that HR policies mandate comprehensive background checks (criminal, credit, reference) for both direct and vendor hires. Ensure screening outcomes and approvals are retained in HR files and vendor contracts.",
+    "answer": "HR policy documents, screening outcome logs, BFSI environment HR files, vendor contract staff checks",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_9d50ef1bebd57_1773746099242",
+    "question": "Review HR and vendor records to ensure that all relevant personnel have signed NDAs. Confirm that processes exist for periodic renewal or updates upon role changes affecting sensitive data handling.",
+    "answer": "NDA forms, Bank data environment HR and vendor records, role change logs",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_576c5d19f2833_1773746099242",
+    "question": "Validate that periodic evaluations are scheduled and executed. Confirm that results, including phishing simulation outcomes, are documented and used to enhance future training.",
+    "answer": "Evaluation schedules, phishing and ransomware simulation logs, follow-up training records",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_3b5835e2c9c5d_1773746099242",
+    "question": "Utilize automated security tools and manual penetration tests for mobile apps, conduct regular reviews and vulnerability assessments, and maintain a central repository for tracking vulnerabilities to ensure that high and critical issues are remediated or formally risk-accepted.",
+    "answer": "Mobile app test reports (SAST/DAST), penetration test results, and centralized vulnerability tracking logs.",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_045280d0cdbc78_1773746099242",
+    "question": "Validate that encryption is implemented per best practices (AES-256 or higher) and that keys are stored securely using HSM or secure vaults. Monitor and review key rotation schedules and access logs.",
+    "answer": "Cryptography policy, system encryption configurations, crypto library documentation; HSM usage records and key vault logs; key rotation logs.database encryption configuration, file server encryption settings, and API endpoint/URL encryption configurations.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_cba32be95302b8_1773746099242",
+    "question": "Confirm that all BFSI transaction data is transmitted over secure channels using TLS 1.2+; validate configurations via server screenshots, network scans, and sample packet captures.",
+    "answer": "TLS configuration screenshots, SSL Labs/scanning results, server documentation, vendor encryption configuration details, network sniff tests, database encryption configuration, file server encryption settings, and API endpoint/URL encryption configurations.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_caa1ca0aa00df_1773746099242",
+    "question": "Confirm that the data classification policy comprehensively covers all critical BFSI data—including ATM transactions and other bank data collected, stored, and processed—and that consistent labeling is applied. Ensure that classification automatically triggers controls (e.g., encryption, restricted access).",
+    "answer": "Data classification policy document, Data flow, Bank data inventory registers, system metadata demonstrating labeling, and records of encryption/access control configurations.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_dfd4cbbdac55d8_1773746099242",
+    "question": "Assess whether data minimization practices are in place by reviewing retention schedules and ensuring that unnecessary bank data is either archived or securely disposed. Verify that retention periods are clearly defined in contracts or SLAs and that data is purged once the period expires.",
+    "answer": "Vendor contract retention clauses, documented data lifecycle logs (archival or purge records), and formal disposal or overwrite procedure documents.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_7654b0c64377f8_1773746099242",
+    "question": "Evaluate that data masking and tokenization solutions are implemented effectively in all relevant environments (logs, test systems). Ensure that sensitive information is not exposed in clear text and that masking mechanisms are active and correctly configured.",
+    "answer": "Sample logs and configuration files from test environments, documentation of masking/tokenization tool usage, and system audit reports showing no exposure of sensitive data.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_33b541346add2_1773746099242",
+    "question": "Examine the configuration and operational status of DLP solutions to ensure they effectively prevent unauthorized data exfiltration. Evaluate alert mechanisms for unusual data movements and confirm that DLP controls extend to vendor staff endpoints where applicable.",
+    "answer": "DLP configuration records, incident and alert logs (including email/endpoint scanning logs), SIEM correlation rules, and contractual DLP requirements for vendor endpoints.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_a3022dcdc7fd8_1773746099242",
+    "question": "Verify that data location policies specify approved storage zones for bank data and that these zones enforce robust physical and logical security controls. Confirm that data residency is monitored and restricted as required.",
+    "answer": "Data center certifications, data residency policy documents, geographic storage records, and access control logs for data locations.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_7e1f93dd516ea8_1773746099242",
+    "question": "Assess system architectures and configurations to confirm that bank data is logically isolated using segmentation techniques. Validate that firewalls, VLANs, and access control lists enforce the segregation of sensitive bank data from other operational systems.",
+    "answer": "Network diagrams, segmentation policies, firewall and access control configuration records, and system audit reports demonstrating logical segregation.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_55308b105ab72_1773746099242",
+    "question": "Evaluate SFTP server configurations to ensure proper encryption (e.g., TLS), robust authentication, and access restrictions. Confirm that SFTP logs are monitored for unauthorized access or unusual transfers.",
+    "answer": "SFTP configuration documentation, encryption settings, access control records, and audit logs of SFTP transactions.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_a6e7231b905ca8_1773746099242",
+    "question": "Review email system configurations to ensure encryption for emails containing sensitive information, effective anti-phishing measures, and spam filtering. Confirm that email traffic is continuously monitored for security anomalies.",
+    "answer": "Email encryption logs, configuration documents, anti-phishing/spam filtering policies, and incident reports.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_f722b209eac78_1773746099242",
+    "question": "Assess the security configurations of chat/messaging platforms to ensure that communications are encrypted and access is restricted. Verify that the platforms are monitored for suspicious activities and that security policies are enforced.",
+    "answer": "Configuration settings for chat platforms, encryption protocol documentation, access control logs, and monitoring/audit records.",
+    "category": "Data Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_f0265143c7d118_1773746099242",
+    "question": "Examine SAST/DAST reports, secure code review records, peer review sign-offs, and WAF configuration. Validate that QA and pen test results are reviewed and approved before release.",
+    "answer": "Tool usage logs, secure code review records, WAF screenshots, penetration test reports",
+    "category": "Application Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_44e1dc87ca78e_1773746099242",
+    "question": "Review API documentation, architecture diagrams, authentication configurations, input validation mechanisms, rate limiting/throttling policies, and pen test reports. Confirm that API endpoints are continuously monitored and that logs are reviewed for suspicious activity.",
+    "answer": "API documentation, security audit reports, authentication configurations, rate limiting logs, SIEM logs, pen test reports\nWAF Screenshots showing API are protected",
+    "category": "Application Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_028f156c9185b_1773746099242",
+    "question": "Review comprehensive pen test reports to ensure full coverage of vulnerabilities and that remediation actions are tracked and completed within defined timelines.",
+    "answer": "Penetration testing reports, remediation logs, retest findings",
+    "category": "Application Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_bba301fb9bd648_1773746099242",
+    "question": "Review access review procedures and logs to verify that user rights are periodically evaluated and adjusted as needed. Confirm evidence of management review and remediation actions.",
+    "answer": "Access review logs, IAM system exports, management meeting minutes",
+    "category": "Application Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_b70a8a1c4d846_1773746099242",
+    "question": "Review sample log files and configuration documentation to ensure log paths are defined and logs capture all relevant security events. Verify log retention per policy.",
+    "answer": "Sample log files, log configuration documentation, log retention policy",
+    "category": "Application Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_320d527d49bfc_1773746099242",
+    "question": "Confirm that container images are regularly scanned, signed, and based on hardened images. Verify that runtime configurations enforce least privilege and that orchestration settings (RBAC, network policies, pod security) and secrets management are properly implemented. Assess CI/CD pipelines for integrated dependency management and security checks.",
+    "answer": "Vulnerability scan reports, image signing records, hardened base image documentation, container configuration files, orchestration platform settings (including RBAC and network policies), secrets management documentation, and CI/CD pipeline security audit reports.",
+    "category": "Application Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_f4bd56e3759818_1773746099242",
+    "question": "Utilize CSPM tools (e.g., Prisma, Dome9) to detect misconfigurations (e.g., open S3 buckets, overly permissive security groups). Ensure cloud resources are aligned with secure baseline configurations and continuously monitor logs for unauthorized configuration changes.",
+    "answer": "CSPM console reports, hardening documentation, configuration change logs.",
+    "category": "Cloud Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_c654a001c98ff_1773746099242",
+    "question": "Confirm tenant isolation configurations (shared vs. dedicated) through architectural and configuration reviews. Review access control policies and role-based access to restrict data access. Validate technical controls to restrict and monitor data downloads, preventing unauthorized exfiltration",
+    "answer": "Cloud architecture diagrams, access control policies, tenant configuration reports, data download restriction policies, and related system logs.",
+    "category": "Cloud Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_e12cd9a78a6c_1773746099242",
+    "question": "Review instance configuration exports, encryption status reports for storage, and LB configuration exports.",
+    "answer": "Screenshots, encryption reports, LB config exports.",
+    "category": "Cloud Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_16f8486300448_1773746099242",
+    "question": "Verify storage bucket configurations via exported screenshots showing access policies, encryption settings, versioning/MFA Delete status, and logging settings.",
+    "answer": "Bucket configuration exports; policy documents.",
+    "category": "Cloud Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_2cd53db603af38_1773746099242",
+    "question": "Evaluate database instance configuration exports for non-public settings, backup schedules, deletion protection, and encryption status reports.",
+    "answer": "Configuration exports; backup schedules; encryption reports; log exports.",
+    "category": "Cloud Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_7b6b88828dc09_1773746099242",
+    "question": "DLP & Email Filtering: Monitor and restrict sensitive data movement and unauthorized file attachments.\nRemovable Media Controls: Enforce USB/media restrictions to prevent data exfiltration.\nThreat Protection: Use antivirus/anti-malware for real-time detection and response.\nPatch & Encryption Management: Regularly update systems and apply full-disk encryption.\nApplication Control: Allow only whitelisted software to run.\nCentralized Authentication: Secure access via Active Directory.",
+    "answer": "Evidence of policies and integration test reports.\nEvidence of logs: DLP, USB, email, antivirus, patching, encryption, whitelisting, AD authentication.\nEvidence of integration with SIEM and endpoint management tools.",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_edc3a574fa77_1773746099242",
+    "question": "Verify that segmentation and access control measures are in place for wireless networks by reviewing network architecture diagrams and access control lists to ensure that wireless networks are effectively isolated from critical systems.",
+    "answer": "Network segmentation diagrams; access control lists; configuration audit reports.",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_4e08efb141125_1773746099242",
+    "question": "Review network diagrams to verify that dedicated VLANs, firewall segments, and subnet definitions are in place. Evaluate the design of firewall rules to ensure that cross-traffic between the ASP environment and corporate networks is restricted. Additionally, perform segmentation tests (e.g., pen tests or network scans) to validate that the isolation is effective and that there is no unauthorized routing between networks.",
+    "answer": "Up-to-date network topology diagrams, documented VLAN definitions, and firewall configuration records are required. Penetration test or segmentation test reports should also be provided to demonstrate that the network segmentation is effective.",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_e357f88139c76_1773746099242",
+    "question": "Review firewall rule sets to confirm that they allow only minimal necessary inbound and outbound traffic. Verify that IDS/IPS signature updates are performed regularly and that the system is integrated with a SOC for real‑time alerting. Additionally, ensure that device configuration backups are maintained and that restore procedures are in place for rapid recovery in the event of a failure.",
+    "answer": "Obtain copies of current firewall rule sets, change management logs, and quarterly rule review meeting minutes. IDS/IPS update logs and SOC alert samples should be provided, as well as backup logs and records from restore tests for critical network device",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_5a093deeacf89_1773746099242",
+    "question": "Ensure that vulnerability scans are conducted on a monthly or quarterly basis and that annual penetration tests are performed on critical segments. Verify that identified vulnerabilities are remediated within defined timelines. Document the remediation process and obtain final management sign-offs on the closure of high or critical vulnerabilities.",
+    "answer": "Provide vulnerability scan schedules, annual penetration test calendars, and detailed scope documents. Additional evidence should include vulnerability management tickets with assigned remediation dates and management sign-off records on the resolution of critical issues.",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_ba7cd406449ba_1773746099242",
+    "question": "Conduct regular scans of all externally facing IP addresses using automated vulnerability scanning tools. Ensure that scan schedules, frequency, and scope cover all critical assets, including those hosting ATM switch services in the ASP environment. Incorporate results into the risk management framework and establish a process for rapid remediation of any identified issues.",
+    "answer": "Collect reports from automated external vulnerability scanning tools, including scan schedules, detailed findings, and remediation tracking records. Documentation of any changes made as a result of scan findings (e.g., configuration updates, patch applications) should be maintained.\nWAF Screenshots showing External Application are protected",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_05e60dcb272868_1773746099242",
+    "question": "Maintain a comprehensive registry that includes all relevant RBI circulars, Master Directions, PCI DSS standards, and other applicable regulations. Map each requirement to internal controls and policies, and update the registry promptly as new or revised regulations are issued.",
+    "answer": "Regulatory compliance register; policy-to-reg matrix; revision logs; official notifications; BFSI mandate references.",
+    "category": "Governance, Risk, and Compliance",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_bb639e09f2301_1773746099242",
+    "question": "Confirm that the external audit or certification scope covers the entire environment. Review external audit and certification reports (such as SOC 2, PCI AoC, and ISO 27001) along with expanded sign-off reports. Ensure compliance with IRDA Cyber Security Guidelines, the Cybersecurity and Cyber Resilience Framework for SEBI Regulated Entities, and PCI compliance requirements. Track any findings or nonconformities with a corrective action plan.",
+    "answer": "PCI AoC or ISO 27001 certificate; scope documents; latest external audit reports; cert-in auditor sign-off reports; corrective action plan logs; IRDA audited report, and CSCRF audited report; BBPS complaince report",
+    "category": "Governance, Risk, and Compliance",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_cb81d8ea082888_1773746099242",
+    "question": "Verify that every change is processed formally through documented change control tickets, tested in a staging or pilot environment, and includes a rollback or contingency procedure. This should be confirmed by reviewing change logs, approvals, and testing records.",
+    "answer": "Change management system logs, Provide sample change record requests, staging/pilot records, test logs, rollback/contingency documentation covering Network devices, Servers, Database etc.",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_8cd3e1f8633eb_1773746099242",
+    "question": "Review patch update schedules, password policy adherence, and antivirus update logs for network devices. Confirm that periodic reviews are documented and any deficiencies are remediated promptly.",
+    "answer": "Provide perodic reveiew report covering Patch management logs, network configuration audit reports, password policy documents, antivirus update reports",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_90fbcbaf53a268_1773746099242",
+    "question": "Evaluate server controls by reviewing patch update logs, password policy enforcement records, antivirus installation reports, and configuration audit reports. Ensure that vulnerability scans and periodic reviews are conducted and any issues remediated.",
+    "answer": "Provide perodic reveiew report covering Patch update logs,, configuration audit reports, password policy documentation, antivirus logs",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_417b0abaa65db8_1773746099242",
+    "question": "Examine database patch logs, configuration audit reports, and records of password policy enforcement. Ensure that databases are included in regular review cycles and that any deviations are promptly corrected.",
+    "answer": "Provide perodic reveiew report covering Database patch logs, configuration audit reports, password policy documents, antivirus scan results",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_d2734607e7df8_1773746099242",
+    "question": "Conduct monthly or quarterly scans that cover the environment, including vendor IP ranges. Validate the process through scan configurations, tool logs, and reports confirming all vulnerabilities are tracked to resolution.",
+    "answer": "Scan configuration documents, scanning tool logs, and scope definition docs; scan reports and GRC tool logs.",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_41b22fa574555_1773746099242",
+    "question": "Verify SIEM configuration captures all critical events; check exception records, log retention, and alert escalation procedures.",
+    "answer": "SIEM config, exception docs, NTP records, retention policy, sample alert logs",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_b81d3457b82808_1773746099242",
+    "question": "Confirm the IR plan covers vendor/ASP roles; verify training, escalation matrices, forensic readiness, and post-incident review processes.",
+    "answer": "IR policy, vendor/ASP annex, tabletop exercise reports, escalation matrices, forensic docs, post-incident reports",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_00c07df2de35f_1773746099242",
+    "question": "Report as soon as criteria are met; no set periodicity.",
+    "answer": "Incident reports; notification logs",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_87baa67ecf6768_1773746099242",
+    "question": "Same reporting timeline as 8.c applies.",
+    "answer": "Incident records; notification logs",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_58eb61bf23f358_1773746099242",
+    "question": "Applies to all payment channels/systems.",
+    "answer": "Transaction reports; system logs",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_162d1192f973d8_1773746099242",
+    "question": "Isolated branch issues not reported unless criteria are met.",
+    "answer": "Service outage reports; branch logs",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_bc2d67e5d66158_1773746099242",
+    "question": "Applies to REs with monthly mobile banking volume ≥ ₹10 crore.",
+    "answer": "Downtime logs; system outage reports",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_df50d0eaa1e76_1773746099242",
+    "question": "Applies to REs with monthly mobile banking volume < ₹10 crore.",
+    "answer": "Downtime logs; outage reports",
+    "category": "Operations Security",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_6ce5fe1f30f13_1773746099242",
+    "question": "Confirm scheduled exercises, ASP inclusion, and documented after-action reports with remediation plans.",
+    "answer": "Exercise schedules, red team scope docs, after-action reports",
+    "category": "Cyber Threats",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_dfd3ced8cd73d8_1773746099242",
+    "question": "Verify ASM tool reports, regular scan logs, and integration of findings into vulnerability management.",
+    "answer": "ASM dashboards, scan logs, integration reports",
+    "category": "Cyber Threats",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_365b8b0adbc4c_1773746099242",
+    "question": "Review server configurations to ensure SYN cookies (or equivalent) are enabled; check logs for dropped incomplete TCP connection attempts.",
+    "answer": "Server configuration files; TCP connection logs; system hardening documentation.",
+    "category": "Cyber Threats",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_616e9d11cd581_1773746099242",
+    "question": "Review email security logs and verify that phishing simulations and training programs are active; check URL filtering configurations for effectiveness.",
+    "answer": "Email filtering logs; phishing simulation reports; training records; URL filtering configuration files.",
+    "category": "Cyber Threats",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_45670624a47778_1773746099242",
+    "question": "Review endpoint protection logs, test backup recovery processes, and assess network segmentation policies and user training records for ransomware protection.",
+    "answer": "Endpoint protection logs; backup solution records; segmentation policy documents; user training materials.",
+    "category": "Cyber Threats",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_1327366e5d7e98_1773746099242",
+    "question": "Verify that periodic physical security audits or spot checks are performed; review audit reports, gap remediation logs, and ensure CCTV footage retention policies meet BFSI guidelines.",
+    "answer": "Physical security audit reports, spot check logs, remediation tracking records, CCTV retention policies, camera system configurations",
+    "category": "Business Continuity and Disaster Recovery",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_39fa62df74f36_1773746099242",
+    "question": "Check DR schedules, test reports & documented improvements.",
+    "answer": "DR test reports, calendars, improvement logs",
+    "category": "Business Continuity and Disaster Recovery",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_aede3f0806fdb_1773746099242",
+    "question": "Confirm that vendor contracts include BCP/DR requirements; review vendor DR site, replication, and backup arrangements.",
+    "answer": "Vendor contracts, joint DR test reports, DR site capacity logs, replication diagrams",
+    "category": "Business Continuity and Disaster Recovery",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_3d498d54db367_1773746099242",
+    "question": "Verify that data collection processes clearly document the source of origin and are supported by established procedures, while confirming that third-party data sources have the necessary authorization and compliance measures in place.",
+    "answer": "Privacy policy available online; screenshots of privacy notice display; consent audit logs",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_2ebbce369c98c_1773746099242",
+    "question": "Check that the privacy notice is prominently displayed (e.g., on the landing page); confirm there is a mechanism to record customer consent; ensure the policy is updated regularly and covers data collection, usage, storage, retention, sharing, and grievance redressal.",
+    "answer": "Privacy policy available online; screenshots of privacy notice display; consent audit logs",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_459f73b960e4c_1773746099242",
+    "question": "Verify that explicit, prior consent is obtained from borrowers and audit trails are maintained; check that mobile permissions are limited and one-time access is clearly documented.",
+    "answer": "Screenshots of consent screens; audit trail logs; mobile permission configurations",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_cd4e9b4cd4268_1773746099242",
+    "question": "Check if the consent mechanism clearly allows borrowers to opt in or out, restrict data sharing, revoke consent, and request deletion; verify that these choices are stored and auditable.",
+    "answer": "Consent screen screenshots; backend consent records; privacy policy excerpts",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_3c7e35695f3388_1773746099242",
+    "question": "Confirm that each consent request clearly explains its purpose (e.g., credit assessment, KYC) and is consistent throughout the customer journey.",
+    "answer": "Screenshots of consent prompts; customer journey documentation",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_e290362741c128_1773746099242",
+    "question": "Ensure explicit consent for data sharing is obtained and stored; request screenshots of the consent and verify backend records.",
+    "answer": "Consent screenshots; backend logs; third-party MSA/NDA excerpts",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_24abd3f48b7fe8_1773746099242",
+    "question": "Check that only essential data is stored; verify a data purging policy exists and non-required data is purged after contract termination.",
+    "answer": "Data inventory reports; purging policy documents; purging certificates",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_cedb5211c1a9a8_1773746099242",
+    "question": "Verify that a comprehensive privacy policy is publicly available, covering data collection, usage, storage, retention, purging, grievance redressal, third-party sharing, marketing/analytics, and cookie data; check update frequency.",
+    "answer": "Privacy policy document; website screenshots; policy update logs",
+    "category": "Data Privacy",
+    "createdAt": "2026-03-17T11:14:59.242Z"
+  },
+  {
+    "id": "kb_b35dc96d850478_1773743339457",
+    "question": "Identity and Access Management",
+    "answer": "Policy Document Uploaded.\nScrennshot of Jumcloud MFA and Aws  MFA",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T10:28:59.457Z"
+  },
+  {
+    "id": "kb_5bbffeec89655_1773743339457",
+    "question": "Infrastructure and Network Security",
+    "answer": "Wireless Network not used for Cloud",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T10:28:59.457Z"
+  },
+  {
+    "id": "kb_ec104d728f655_1773743318767",
+    "question": "Identity and Access Management",
+    "answer": "Policy Document Uploaded.\nScrennshot of Jumcloud MFA and Aws  MFA",
+    "category": "Identity and Access Management",
+    "createdAt": "2026-03-17T10:28:38.767Z"
+  },
+  {
+    "id": "kb_0c8095408d734_1773743318771",
+    "question": "Infrastructure and Network Security",
+    "answer": "Wireless Network not used for Cloud",
+    "category": "Infrastructure and Network Security",
+    "createdAt": "2026-03-17T10:28:38.771Z"
+  },
+  {
     "id": "kb_ede3cf6f3444f8_1773668861493",
     "question": "Is a firewall installed between the internet and the cardholder data environment (CDE)?",
     "answer": "Yes, firewalls are deployed to restrict unauthorized traffic between the internet and CDE.",
