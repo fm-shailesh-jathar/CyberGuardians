@@ -6,14 +6,27 @@
 <title>Flexmoney Security Dashboard Audit</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script>
+  (() => {
+    try {
+      const savedTheme = localStorage.getItem('cg-theme') || 'dark';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+  })();
+</script>
 <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="logo-wrap">
+    <button class="sidebar-toggle" type="button" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 6h16M4 12h16M4 18h16"></path>
+      </svg>
+    </button>
     <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5L12 1z"/></svg></div>
-    <span class="logo-name">Secure<em>Audit</em> RAG</span>
+    <span class="logo-name">Flexmoney <em>Audit</em> AI</span>
     <span class="rag-chip">AI v2</span>
   </div>
   <div class="topbar-mid">
@@ -27,6 +40,11 @@
     <button class="topbar-btn" onclick="openModal('settingsModal')" title="Settings">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
+    <select class="theme-select" id="themeSelect" aria-label="Theme">
+      <option value="dark">Dark</option>
+      <option value="light">Light</option>
+      <option value="cyber">Cyber</option>
+    </select>
     <div class="user-pill">
       <div class="user-av">AK</div>
       <div><div style="font-size:12px;font-weight:500">Arjun K.</div><div class="user-role">CISO</div></div>
@@ -49,29 +67,59 @@
 
 <!-- SIDEBAR -->
 <nav class="sidebar">
-  <div class="sidebar-section">Overview</div>
-  <button class="nav-btn active" onclick="nav('dashboard',this)"><span class="nav-icon">◧</span>Dashboard</button>
-  <button class="nav-btn" onclick="nav('analytics',this)"><span class="nav-icon">📊</span>Analytics</button>
-  <button class="nav-btn" onclick="nav('notifications',this)"><span class="nav-icon">🔔</span>Notifications<span class="nav-badge">5</span></button>
+  <div class="sidebar-group">
+    <button class="sidebar-section-toggle open" type="button" data-group="overview" onclick="toggleSidebarGroup(this)" aria-expanded="true">
+      <span class="sect-label">Overview</span><span class="sect-caret">▾</span>
+    </button>
+    <div class="sidebar-group-items open">
+      <button class="nav-btn active" onclick="nav('dashboard',this)" title="Dashboard"><span class="nav-icon">◧</span><span class="nav-label">Dashboard</span></button>
+      <button class="nav-btn" onclick="nav('analytics',this)" title="Analytics"><span class="nav-icon">📊</span><span class="nav-label">Analytics</span></button>
+      <button class="nav-btn" onclick="nav('notifications',this)" title="Notifications"><span class="nav-icon">🔔</span><span class="nav-label">Notifications</span><span class="nav-badge">5</span></button>
+    </div>
+  </div>
 
-  <div class="sidebar-section">Audits</div>
-  <button class="nav-btn" onclick="nav('lender',this)"><span class="nav-icon">🏦</span>Lender Audits<span class="nav-badge amber">2</span></button>
-  <button class="nav-btn" onclick="nav('pci',this)"><span class="nav-icon">🔐</span>PCI DSS</button>
+  <div class="sidebar-group">
+    <button class="sidebar-section-toggle open" type="button" data-group="audits" onclick="toggleSidebarGroup(this)" aria-expanded="true">
+      <span class="sect-label">Audits</span><span class="sect-caret">▾</span>
+    </button>
+    <div class="sidebar-group-items open">
+      <button class="nav-btn" onclick="nav('lender',this)" title="Lender Audits"><span class="nav-icon">🏦</span><span class="nav-label">Lender Audits</span><span class="nav-badge amber">2</span></button>
+      <button class="nav-btn" onclick="nav('pci',this)" title="PCI DSS"><span class="nav-icon">🔐</span><span class="nav-label">PCI DSS</span></button>
+    </div>
+  </div>
 
-  <div class="sidebar-section">Compliance</div>
-  <button class="nav-btn" onclick="nav('training',this)"><span class="nav-icon">🎓</span>Training</button>
-  <button class="nav-btn" onclick="nav('internal',this)"><span class="nav-icon">📋</span>Internal Assessment<span class="nav-badge">1</span></button>
-  <button class="nav-btn" onclick="nav('documents',this)"><span class="nav-icon">📁</span>Document Review</button>
+  <div class="sidebar-group">
+    <button class="sidebar-section-toggle open" type="button" data-group="compliance" onclick="toggleSidebarGroup(this)" aria-expanded="true">
+      <span class="sect-label">Compliance</span><span class="sect-caret">▾</span>
+    </button>
+    <div class="sidebar-group-items open">
+      <button class="nav-btn" onclick="nav('training',this)" title="Training"><span class="nav-icon">🎓</span><span class="nav-label">Training</span></button>
+      <button class="nav-btn" onclick="nav('internal',this)" title="Internal Assessment"><span class="nav-icon">📋</span><span class="nav-label">Internal Assessment</span><span class="nav-badge">1</span></button>
+      <button class="nav-btn" onclick="nav('documents',this)" title="Document Review"><span class="nav-icon">📁</span><span class="nav-label">Document Review</span></button>
+    </div>
+  </div>
 
-  <div class="sidebar-section">AI Engine</div>
-  <button class="nav-btn" onclick="nav('rag',this)"><span class="nav-icon">⚡</span>RAG Pipeline</button>
-  <button class="nav-btn" onclick="nav('kb',this)"><span class="nav-icon">🧠</span>Knowledge Base</button>
-  <button class="nav-btn" onclick="nav('audit',this)"><span class="nav-icon">📤</span>Audit Upload</button>
-  <button class="nav-btn" onclick="nav('chat',this)"><span class="nav-icon">💬</span>Chatbot</button>
-  <button class="nav-btn" onclick="nav('trail',this)"><span class="nav-icon">📜</span>Audit Trail</button>
+  <div class="sidebar-group">
+    <button class="sidebar-section-toggle open" type="button" data-group="ai-engine" onclick="toggleSidebarGroup(this)" aria-expanded="true">
+      <span class="sect-label">AI Engine</span><span class="sect-caret">▾</span>
+    </button>
+    <div class="sidebar-group-items open">
+      <button class="nav-btn" onclick="nav('rag',this)" title="RAG Pipeline"><span class="nav-icon">⚡</span><span class="nav-label">RAG Pipeline</span></button>
+      <button class="nav-btn" onclick="nav('kb',this)" title="Knowledge Base"><span class="nav-icon">🧠</span><span class="nav-label">Knowledge Base</span></button>
+      <button class="nav-btn" onclick="nav('audit',this)" title="Audit Upload"><span class="nav-icon">📤</span><span class="nav-label">Audit Upload</span></button>
+      <button class="nav-btn" onclick="nav('chat',this)" title="Chatbot"><span class="nav-icon">💬</span><span class="nav-label">Chatbot</span></button>
+      <button class="nav-btn" onclick="nav('trail',this)" title="Audit Trail"><span class="nav-icon">📜</span><span class="nav-label">Audit Trail</span></button>
+    </div>
+  </div>
 
-  <div class="sidebar-section">Admin</div>
-  <button class="nav-btn" onclick="nav('rbac',this)"><span class="nav-icon">👥</span>Users & RBAC</button>
+  <div class="sidebar-group">
+    <button class="sidebar-section-toggle open" type="button" data-group="admin" onclick="toggleSidebarGroup(this)" aria-expanded="true">
+      <span class="sect-label">Admin</span><span class="sect-caret">▾</span>
+    </button>
+    <div class="sidebar-group-items open">
+      <button class="nav-btn" onclick="nav('rbac',this)" title="Users & RBAC"><span class="nav-icon">👥</span><span class="nav-label">Users & RBAC</span></button>
+    </div>
+  </div>
 
   <div class="sidebar-footer">
     <div class="system-status"><div class="status-online"></div>All systems operational</div>
@@ -665,8 +713,8 @@
     <span class="badge b-gray" id="kbCountBadge">0 entries</span>
   </div>
 
-  <div class="card">
-    <div style="overflow:auto">
+  <div class="card kb-table-card">
+    <div class="kb-table-scroll">
       <table class="tbl" id="kbTable">
         <thead><tr><th style="width:28%">Question</th><th>Answer</th><th style="width:14%">Category</th><th style="width:130px">Actions</th></tr></thead>
         <tbody></tbody>
@@ -758,7 +806,7 @@
           <button class="act-btn primary" onclick="sendChat()">Send</button>
         </div>
         <div class="hint" style="margin-top:10px">
-          KB-only policy: If confidence &lt; <span style="font-family:var(--mono)">0.80</span>, the bot returns <span style="font-family:var(--mono)">Manual response required</span>.
+          Hybrid policy: KB match first (min confidence <span style="font-family:var(--mono)">0.80</span>). If not related to KB, returns a web/general AI answer (if enabled).
         </div>
       </div>
     </div>
@@ -964,6 +1012,25 @@
     <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px"><button class="act-btn" onclick="closeModal('addUserModal')">Cancel</button><button class="act-btn primary" onclick="closeModal('addUserModal');alert('Invitation sent! User will receive SSO onboarding email.')">Send Invite</button></div>
   </div>
 </div>
+<script>
+  (() => {
+    const THEME_KEY = 'cg-theme';
+    const select = document.getElementById('themeSelect');
+    if (!select) return;
+
+    try {
+      const savedTheme = localStorage.getItem(THEME_KEY) || 'dark';
+      select.value = savedTheme;
+      document.documentElement.setAttribute('data-theme', savedTheme);
+    } catch (e) {}
+
+    select.addEventListener('change', () => {
+      const theme = select.value || 'dark';
+      document.documentElement.setAttribute('data-theme', theme);
+      try { localStorage.setItem(THEME_KEY, theme); } catch (e) {}
+    });
+  })();
+</script>
 <script defer src="./app.js"></script>
 </body>
 </html>

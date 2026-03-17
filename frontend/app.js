@@ -8,6 +8,52 @@ function nav(id, btn) {
   if (id === 'analytics') initCharts();
 }
 
+// ── SIDEBAR ──
+const SIDEBAR_COLLAPSE_KEY = 'sa_sidebar_collapsed_v1';
+const SIDEBAR_GROUP_KEY_PREFIX = 'sa_sidebar_group_v1_';
+
+function setSidebarCollapsed(collapsed) {
+  document.body.classList.toggle('sidebar-collapsed', collapsed);
+  try { localStorage.setItem(SIDEBAR_COLLAPSE_KEY, collapsed ? '1' : '0'); } catch (e) {}
+}
+
+function toggleSidebar() {
+  setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+}
+
+function toggleSidebarGroup(btn) {
+  if (!btn) return;
+  const items = btn.nextElementSibling;
+  const isOpen = !btn.classList.contains('open');
+
+  btn.classList.toggle('open', isOpen);
+  if (items) items.classList.toggle('open', isOpen);
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+  const groupId = btn.dataset && btn.dataset.group;
+  if (groupId) {
+    try { localStorage.setItem(SIDEBAR_GROUP_KEY_PREFIX + groupId, isOpen ? '1' : '0'); } catch (e) {}
+  }
+}
+
+function initSidebar() {
+  try {
+    const collapsed = localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === '1';
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+
+    document.querySelectorAll('.sidebar-section-toggle[data-group]').forEach(btn => {
+      const groupId = btn.dataset.group;
+      const saved = localStorage.getItem(SIDEBAR_GROUP_KEY_PREFIX + groupId);
+      if (saved === null) return;
+      const isOpen = saved === '1';
+      btn.classList.toggle('open', isOpen);
+      const items = btn.nextElementSibling;
+      if (items) items.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  } catch (e) {}
+}
+
 // ── ACCORDION ──
 function toggleAcc(h) {
   h.classList.toggle('open');
@@ -295,7 +341,12 @@ function saNormalizeForMatch(text) {
 function saTokenize(text) {
   const norm = saNormalizeForMatch(text);
   if (!norm) return [];
-  return norm.split(/\s+/).filter(t => t && !SA_STOPWORDS.has(t) && t.length > 1);
+  const stem = (t) => {
+    if (t.length > 3 && t.endsWith('ies')) return t.slice(0, -3) + 'y';
+    if (t.length > 3 && t.endsWith('s') && !t.endsWith('ss')) return t.slice(0, -1);
+    return t;
+  };
+  return norm.split(/\s+/).map(stem).filter(t => t && !SA_STOPWORDS.has(t) && t.length > 1);
 }
 
 function saBuildIndex(entries) {
@@ -1164,32 +1215,102 @@ function chatAppend(role, text, meta) {
   log.scrollTop = log.scrollHeight;
 }
 
+function chatAppendPending(text = 'Thinking…') {
+  const log = document.getElementById('chatLog');
+  if (!log) return null;
+  const bubble = document.createElement('div');
+  bubble.className = 'chat-bubble bot';
+  bubble.dataset.pending = '1';
+  bubble.innerHTML = saEscapeHtml(text);
+  log.appendChild(bubble);
+  log.scrollTop = log.scrollHeight;
+  return bubble;
+}
+
+function chatUpdateBubble(bubble, text, meta) {
+  if (!bubble) return;
+  bubble.dataset.pending = '0';
+  bubble.innerHTML = saEscapeHtml(text).replaceAll('\\n', '<br>');
+  if (meta) {
+    const m = document.createElement('div');
+    m.className = 'chat-meta';
+    m.textContent = meta;
+    bubble.appendChild(m);
+  }
+}
+
 function chatQuick(q) {
   const i = document.getElementById('chatInput');
   if (i) i.value = q;
   sendChat();
 }
 
-function sendChat() {
+async function callOllama(prompt) {
+  const res = await fetch('/api/ollama', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt })
+  });
+  const data = await res.json().catch(() => null);
+  return data && typeof data.response === 'string' ? data.response : null;
+}
+
+async function saChat(question) {
+  const res = await fetch('/api/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question, threshold: saKbThreshold, rephrase: false, maxResponseMs: 10000 })
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const msg = data && (data.error || data.response);
+    throw new Error(msg || `HTTP ${res.status}`);
+  }
+  return data;
+}
+
+async function sendChat() {
   const input = document.getElementById('chatInput');
   if (!input) return;
   const q = input.value.trim();
   if (!q) return;
   input.value = '';
   chatAppend('user', q);
+  const pending = chatAppendPending();
+  input.disabled = true;
 
-  const best = saBestKBMatch(q);
   let answer, meta, last;
-  if (!best || best.score < saKbThreshold) {
-    answer = 'No answer found in knowledge base. Manual response required.';
-    meta = best ? `Matched: ${best.entry.question} · Confidence: ${best.score.toFixed(2)}` : `Confidence: 0.00`;
-    last = { question: q, answer, confidence: best ? best.score : 0, sourceQuestion: best ? best.entry.question : null, status: 'Manual', createdAt: saNowISO() };
-  } else {
-    answer = best.entry.answer;
-    meta = `Matched: ${best.entry.question} · Confidence: ${best.score.toFixed(2)}`;
-    last = { question: q, answer, confidence: best.score, sourceQuestion: best.entry.question, status: 'Auto', createdAt: saNowISO() };
+  try {
+    const r = await saChat(q);
+    answer = (r && r.answer) ? String(r.answer) : 'No answer found. Manual review required.';
+    const conf = Number(r && r.confidence) || 0;
+    const src = r && r.sourceQuestion ? String(r.sourceQuestion) : null;
+    const source = (r && r.source) ? String(r.source) : null;
+    const webError = (r && r.webError) ? String(r.webError) : null;
+
+    if (r && r.status === 'Auto') meta = `KB Match · ${src || '—'} · Confidence: ${conf.toFixed(2)}`;
+    else if (source === 'internet') meta = `Not in KB · Web answer`;
+    else if (source === 'general') meta = `Not in KB · General AI answer (local model)` + (webError ? ` · Web failed` : ``);
+    else if (source === 'kb' && r && r.status === 'AI') meta = `KB-grounded AI (Ollama) · Confidence: ${conf.toFixed(2)}`;
+    else if (r && r.status === 'Manual' && src && conf >= 0.25) meta = `Closest KB: ${src} · Confidence: ${conf.toFixed(2)}`;
+    else meta = `Not in KB · Manual review required.` + (webError ? ` · Web failed` : ``);
+
+    last = { question: q, answer, confidence: conf, sourceQuestion: src, status: (r && r.status) || 'Manual', source: source || null, createdAt: saNowISO(), normalizedQuestion: (r && r.normalizedQuestion) || null };
+  } catch (e) {
+    const best = saBestKBMatch(q);
+    if (!best || best.score < saKbThreshold) {
+      answer = 'No answer found in knowledge base. Manual response required.';
+      meta = (best && best.score >= 0.25) ? `Closest KB: ${best.entry.question} · Confidence: ${best.score.toFixed(2)}` : `Not in KB · Manual review required.`;
+      last = { question: q, answer, confidence: best ? best.score : 0, sourceQuestion: (best && best.score >= 0.25) ? best.entry.question : null, status: 'Manual', source: null, createdAt: saNowISO(), error: String(e && e.message || e || 'Backend error') };
+    } else {
+      answer = best.entry.answer;
+      meta = `KB Match · ${best.entry.question} · Confidence: ${best.score.toFixed(2)} (Backend unavailable)`;
+      last = { question: q, answer, confidence: best.score, sourceQuestion: best.entry.question, status: 'Auto', source: 'kb', createdAt: saNowISO(), error: String(e && e.message || e || 'Backend error') };
+    }
   }
-  chatAppend('bot', answer, meta);
+  chatUpdateBubble(pending, answer, meta);
+  input.disabled = false;
+  input.focus();
 
   const box = document.getElementById('chatLastMatch');
   if (box) box.textContent = meta;
@@ -1436,6 +1557,7 @@ function buildHeatmap() {
 // Date header
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
-  document.title = 'SecureAudit RAG v2 — ' + now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+  initSidebar();
+  document.title = 'Flexmoney Audit AI v2 — ' + now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
   saInitAssistant();
 });
