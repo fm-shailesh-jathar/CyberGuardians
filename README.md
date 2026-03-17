@@ -1,6 +1,28 @@
-# SecureAudit RAG v2 (Frontend + Backend)
+# Flexmoney Audit AI v2 (Frontend + Backend)
 
-This repo started as a single-file HTML prototype (`secureaudit_v2.html`). It now includes a split **frontend/** and **backend/** so the Knowledge Base can persist via a lightweight API server.
+This repo started as a single-file HTML prototype (`secureaudit_v2.html`). It now includes a split `frontend/` and `backend/` so the Knowledge Base can persist via a lightweight API server.
+
+## Version history (v1.x)
+
+Update this section on every change:
+- Bump `v1.x.y` (minor = feature, patch = fix).
+- Add what changed + how it works.
+
+### v1.2.0 (2026-03-17)
+
+UI navigation improvements:
+- Renamed the top brand name to **Flexmoney Audit AI**.
+- Sidebar is now collapsible.
+- Sidebar sections (Overview/Audits/Compliance/AI Engine/Admin) are collapsible, with open/close state persisted in `localStorage`.
+
+### v1.1.0 (2026-03-17)
+
+Audit Upload (Flexmoney Security Dashboard Audit) improvements:
+- Upload modal: removed the drag/drop “upload box”; file selection is via a simple “Choose file” control.
+- Recent Uploads: per-file delete + “Clear all”, and the UI shows the uploaded file count.
+- Results: Manual items are editable; low-confidence items still pre-fill answers but remain editable, and manual edits are rephrased for clearer wording on save.
+- Fill + Export: after all questions have answers, you can “Fill answers” and then export a filled file.
+  - CSV/XLSX uploads export in-place: the original grid is preserved and only the existing Answer/Response column is filled (no extra rows/columns are added).
 
 ## What I implemented (features)
 
@@ -28,7 +50,7 @@ This repo started as a single-file HTML prototype (`secureaudit_v2.html`). It no
 
 ### Similarity / “Semantic” matching (prototype)
 
-- Implements a TF‑IDF + overlap scorer with a few security-term expansions (e.g., MFA/2FA/SIEM/VAPT).
+- Implements a TF-IDF + overlap scorer with a few security-term expansions (e.g., MFA/2FA/SIEM/VAPT).
 - This is a browser-friendly stand-in for embeddings (no OpenAI calls, no vector DB).
 
 ## Project structure
@@ -44,9 +66,12 @@ This repo started as a single-file HTML prototype (`secureaudit_v2.html`). It no
 
 The backend serves the frontend and provides `/api` endpoints.
 
-PowerShell:
+Ubuntu / Linux:
 
-`python -u backend/server.py --host 127.0.0.1 --port 8000`
+```bash
+cd /home/shailesh.jathar/Mydoc/cloudops/Flexathon/Flexathon-Cyber/CyberGuardians
+python3 -u backend/server.py --host 127.0.0.1 --port 8000
+```
 
 Then open:
 
@@ -71,5 +96,5 @@ The frontend auto-syncs KB:
 
 ## Notes / limitations
 
-- Audit runs and chat history still persist in the browser (localStorage) in this version.
+- Audit runs and chat history still persist in the browser (`localStorage`) in this version.
 - PDF parsing is not implemented (future phase).

@@ -8,6 +8,52 @@ function nav(id, btn) {
   if (id === 'analytics') initCharts();
 }
 
+// ── SIDEBAR ──
+const SIDEBAR_COLLAPSE_KEY = 'sa_sidebar_collapsed_v1';
+const SIDEBAR_GROUP_KEY_PREFIX = 'sa_sidebar_group_v1_';
+
+function setSidebarCollapsed(collapsed) {
+  document.body.classList.toggle('sidebar-collapsed', collapsed);
+  try { localStorage.setItem(SIDEBAR_COLLAPSE_KEY, collapsed ? '1' : '0'); } catch (e) {}
+}
+
+function toggleSidebar() {
+  setSidebarCollapsed(!document.body.classList.contains('sidebar-collapsed'));
+}
+
+function toggleSidebarGroup(btn) {
+  if (!btn) return;
+  const items = btn.nextElementSibling;
+  const isOpen = !btn.classList.contains('open');
+
+  btn.classList.toggle('open', isOpen);
+  if (items) items.classList.toggle('open', isOpen);
+  btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+
+  const groupId = btn.dataset && btn.dataset.group;
+  if (groupId) {
+    try { localStorage.setItem(SIDEBAR_GROUP_KEY_PREFIX + groupId, isOpen ? '1' : '0'); } catch (e) {}
+  }
+}
+
+function initSidebar() {
+  try {
+    const collapsed = localStorage.getItem(SIDEBAR_COLLAPSE_KEY) === '1';
+    document.body.classList.toggle('sidebar-collapsed', collapsed);
+
+    document.querySelectorAll('.sidebar-section-toggle[data-group]').forEach(btn => {
+      const groupId = btn.dataset.group;
+      const saved = localStorage.getItem(SIDEBAR_GROUP_KEY_PREFIX + groupId);
+      if (saved === null) return;
+      const isOpen = saved === '1';
+      btn.classList.toggle('open', isOpen);
+      const items = btn.nextElementSibling;
+      if (items) items.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+  } catch (e) {}
+}
+
 // ── ACCORDION ──
 function toggleAcc(h) {
   h.classList.toggle('open');
@@ -1436,6 +1482,7 @@ function buildHeatmap() {
 // Date header
 document.addEventListener('DOMContentLoaded', () => {
   const now = new Date();
-  document.title = 'SecureAudit RAG v2 — ' + now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
+  initSidebar();
+  document.title = 'Flexmoney Audit AI v2 — ' + now.toLocaleDateString('en-IN', {day:'2-digit', month:'short', year:'numeric'});
   saInitAssistant();
 });
