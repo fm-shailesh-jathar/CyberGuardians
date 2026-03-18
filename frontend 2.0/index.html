@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuditAI Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer src="./app.js"></script>
+  <style>
+    :root {
+      --bg: #f4f9f9;
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --primary: #0ea5e9; /* blue */
+      --secondary: #10b981; /* green */
+      --danger: #ef4444;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .app {
+      display: flex;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #0ea5e9, #10b981);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: white;
+      transition: width 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      overflow: hidden;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      white-space: nowrap;
+    }
+
+    .sidebar nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      margin-bottom: 6px;
+      border-radius: 8px;
+      color: rgba(255,255,255,0.8);
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .sidebar nav a:hover,
+    .sidebar nav a.active {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    .sidebar-section-toggle {
+      width: 100%;
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.20);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      padding: 10px 12px;
+      margin: 12px 0 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.2px;
+      transition: background 160ms ease, transform 120ms ease;
+    }
+
+    .sidebar-section-toggle:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+
+    .sect-caret {
+      opacity: 0.9;
+      transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .sidebar-section-toggle.open .sect-caret {
+      transform: rotate(180deg);
+    }
+
+    .sidebar-group-items {
+      overflow: hidden;
+      max-height: 520px;
+      opacity: 1;
+      transition: max-height 260ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 160ms ease;
+    }
+
+    .sidebar-group-items:not(.open) {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    body.sidebar-collapsed .sidebar-section-toggle .sect-label {
+      opacity: 0;
+      transform: translateX(-6px);
+      pointer-events: none;
+    }
+
+    body.sidebar-collapsed .sidebar-section-toggle .sect-caret {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .nav-icon {
+      width: 22px;
+      height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 22px;
+      font-size: 16px;
+      line-height: 1;
+      filter: drop-shadow(0 1px 1px rgba(0,0,0,0.15));
+    }
+
+    .nav-label {
+      display: inline-block;
+      white-space: nowrap;
+      transform: translateX(0);
+      opacity: 1;
+      transition: opacity 160ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    body.sidebar-collapsed .sidebar {
+      width: 76px;
+      padding-left: 14px;
+      padding-right: 14px;
+    }
+
+    body.sidebar-collapsed .logo-text {
+      opacity: 0;
+      transform: translateX(-6px);
+      pointer-events: none;
+      transition: opacity 140ms ease, transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    body.sidebar-collapsed .nav-label {
+      opacity: 0;
+      transform: translateX(-10px);
+      pointer-events: none;
+    }
+
+    body.sidebar-collapsed .sidebar-footer-text {
+      display: none;
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 20px;
+      background: white;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+    }
+
+    .topbar input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: #f9fafb;
+      width: 300px;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-toggle {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+
+    .sidebar-toggle:hover {
+      background: #f9fafb;
+      transform: translateY(-1px);
+    }
+
+    .sidebar-toggle svg {
+      width: 18px;
+      height: 18px;
+      color: #334155;
+    }
+
+    .dashboard {
+      padding: 20px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card h4 {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .card p {
+      font-size: 26px;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .card.primary p { color: var(--primary); }
+    .card.secondary p { color: var(--secondary); }
+    .card.danger p { color: var(--danger); }
+
+    .chart-card {
+      margin-top: 20px;
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .activity {
+      margin-top: 20px;
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .activity li {
+      margin: 8px 0;
+      color: var(--muted);
+    }
+
+    /* Views (used by app.js navigation) */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* KB + Chat minimal styling (keeps functionality readable) */
+    .kb, .chat { padding: 20px; }
+    .kb-head, .chat-head { display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom: 12px; }
+    .kb-actions, .chat-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn {
+      border: 1px solid var(--border);
+      background: white;
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn.primary { background: var(--primary); border-color: var(--primary); color: white; }
+    .btn.danger { border-color: var(--danger); background: rgba(239,68,68,0.10); color: #7f1d1d; }
+
+    .kb-toolbar, .chat-toolbar { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom: 12px; }
+    .kb-toolbar input, .kb-toolbar select, .chat-compose textarea {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      background: #f9fafb;
+    }
+
+    .kb-table-card, .chat-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    .kb-table-scroll { max-height: calc(100vh - 280px); overflow: auto; }
+    table.kb-table { width:100%; border-collapse: collapse; }
+    table.kb-table th, table.kb-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); text-align:left; vertical-align: top; }
+    table.kb-table th { font-size: 12px; color: var(--muted); background: #f9fafb; position: sticky; top: 0; }
+
+    .kb-actions-cell { display:flex; gap:8px; flex-wrap:wrap; }
+    .mini-btn { border: 1px solid var(--border); background: white; padding: 8px 12px; border-radius: 999px; cursor:pointer; font-weight: 600; font-size: 12px; }
+    .mini-btn.primary { background: var(--primary); border-color: var(--primary); color: white; }
+    .mini-btn.danger { border-color: var(--danger); background: rgba(239,68,68,0.10); color: #7f1d1d; }
+
+    .chip {
+      display:inline-flex; align-items:center; padding: 8px 12px; border-radius: 999px;
+      border: 1px solid var(--border); background: #f9fafb; color: var(--muted); font-size: 12px; font-weight: 600;
+      cursor: pointer;
+    }
+    .chip.ok { border-color: rgba(34,197,94,0.55); }
+    .chip.bad { border-color: rgba(239,68,68,0.6); }
+
+    .chat-log { padding: 14px; height: calc(100vh - 360px); overflow: auto; display:flex; flex-direction: column; gap: 10px; }
+    .msg { padding: 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: #fff; max-width: 780px; white-space: pre-wrap; word-break: break-word; }
+    .msg.user { align-self: flex-end; background: rgba(14,165,233,0.12); border-color: rgba(14,165,233,0.22); }
+    .msg-meta { margin-top: 6px; font-size: 11px; color: var(--muted); }
+    .chat-compose { display:flex; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--border); background: #f9fafb; }
+    .chat-compose textarea { flex: 1; min-height: 44px; resize: vertical; background: white; }
+
+    /* Modal */
+    .modal-bg { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(15,23,42,0.55); }
+    .modal-bg.open { display: flex; }
+    .modal { width: min(720px, 100%); background: white; border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12); padding: 16px; }
+    .modal-head { display:flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 1px solid var(--border); margin-bottom: 12px; }
+    .modal-close { border: 0; background: transparent; font-size: 22px; cursor: pointer; color: var(--muted); }
+    .form-field { margin-bottom: 12px; }
+    .form-label { display:block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+    .form-input { width:100%; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: #f9fafb; }
+    .modal-actions { display:flex; justify-content: flex-end; gap: 10px; padding-top: 10px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+    .hint { font-size: 12px; color: var(--muted); margin: -4px 0 12px; }
+
+    /* Audit Upload */
+    .audit { padding: 20px; }
+    .audit-head { display:flex; justify-content: space-between; align-items:flex-end; gap: 12px; margin-bottom: 12px; }
+    .audit-sub { color: var(--muted); margin-top: 6px; font-size: 13px; }
+    .audit-actions { display:flex; gap: 10px; flex-wrap: wrap; }
+    .audit-card { background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); padding: 14px; }
+    .audit-grid { display:grid; grid-template-columns: 1.2fr 0.8fr; gap: 12px; }
+    .audit-tip { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .uploads-list { margin-top: 10px; display:flex; flex-direction: column; gap: 8px; }
+    .upload-item { display:flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px; background: #f9fafb; }
+    .upload-actions { display:flex; align-items:center; gap: 8px; }
+    .upload-del { border: 1px solid var(--border); background: white; padding: 8px 10px; border-radius: 999px; cursor:pointer; font-weight: 700; font-size: 12px; color: #7f1d1d; }
+    .upload-del:hover { border-color: rgba(239,68,68,0.6); background: rgba(239,68,68,0.10); }
+    .upload-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .audit-controls { display:flex; gap: 12px; align-items:center; flex-wrap: wrap; margin: 12px 0; }
+    .badge { font-size: 12px; color: var(--muted); }
+    .tbl-wrap { overflow: auto; max-height: calc(100vh - 360px); border: 1px solid var(--border); border-radius: 12px; }
+    table.audit-table { width: 100%; border-collapse: collapse; background: white; }
+    table.audit-table th, table.audit-table td { padding: 12px 14px; border-bottom: 1px solid var(--border); vertical-align: top; text-align: left; }
+    table.audit-table th { font-size: 12px; color: var(--muted); background: #f9fafb; position: sticky; top: 0; }
+    .conf { font-weight: 700; font-size: 12px; }
+    .conf.high { color: #10b981; }
+    .conf.med { color: #f59e0b; }
+    .conf.low { color: #ef4444; }
+    .status-pill { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--border); background: #f9fafb; display:inline-flex; }
+    .status-pill.auto { border-color: rgba(16,185,129,0.35); background: rgba(16,185,129,0.10); color: #065f46; }
+    .status-pill.manual { border-color: rgba(239,68,68,0.35); background: rgba(239,68,68,0.10); color: #7f1d1d; }
+    .ans-edit { width: min(560px, 100%); min-height: 44px; border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px; background: #fff; resize: vertical; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar">
+    <div>
+      <div class="logo">
+        <span class="logo-icon">⚡</span>
+        <span class="logo-text">AuditAI</span>
+      </div>
+      <nav id="sidebarNav">
+        <button
+          class="sidebar-section-toggle open"
+          type="button"
+          data-group="overview"
+          aria-expanded="true"
+          aria-controls="sidebar-group-overview"
+        >
+          <span class="sect-label">Overview</span><span class="sect-caret">▾</span>
+        </button>
+        <div class="sidebar-group-items open" id="sidebar-group-overview">
+          <a class="active" href="#" data-view="dashboard" data-icon="📊" data-label="Dashboard">Dashboard</a>
+          <a href="#" data-icon="📈" data-label="Analytics">Analytics</a>
+        </div>
+
+        <button
+          class="sidebar-section-toggle open"
+          type="button"
+          data-group="audits"
+          aria-expanded="true"
+          aria-controls="sidebar-group-audits"
+        >
+          <span class="sect-label">Audits</span><span class="sect-caret">▾</span>
+        </button>
+        <div class="sidebar-group-items open" id="sidebar-group-audits">
+          <a href="#" data-icon="🏦" data-label="Lender Audit">Lender Audit</a>
+          <a href="#" data-icon="🔒" data-label="PCI DSS">PCI DSS</a>
+        </div>
+
+        <button
+          class="sidebar-section-toggle open"
+          type="button"
+          data-group="ai-engine"
+          aria-expanded="true"
+          aria-controls="sidebar-group-ai-engine"
+        >
+          <span class="sect-label">AI Engine</span><span class="sect-caret">▾</span>
+        </button>
+        <div class="sidebar-group-items open" id="sidebar-group-ai-engine">
+          <a href="#" data-view="kb" data-icon="🧠" data-label="Knowledge Base">Knowledge Base</a>
+          <a href="#" data-view="chat" data-icon="💬" data-label="Chatbot">Chatbot</a>
+          <a href="#" data-view="audit" data-icon="📤" data-label="Audit Upload">Audit Upload</a>
+        </div>
+      </nav>
+    </div>
+    <div style="font-size:12px;display:flex;align-items:center;gap:8px;">
+      <span aria-hidden="true">●</span>
+      <span class="sidebar-footer-text">System Healthy</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="sidebar-toggle" id="sidebarToggleBtn" type="button" aria-label="Toggle sidebar">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M4 6h16M4 12h16M4 18h16"></path>
+          </svg>
+        </button>
+        <input placeholder="Search..." />
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <span class="chip" id="backendStatusChip" title="Backend status">Backend: checking...</span>
+        <div>👤 Admin</div>
+      </div>
+    </header>
+
+    <section class="dashboard view active" data-view="dashboard">
+      <div class="cards">
+        <div class="card primary"><h4>Active Audits</h4><p>5</p></div>
+        <div class="card secondary"><h4>Compliance</h4><p>77%</p></div>
+        <div class="card"><h4>Pending</h4><p>23</p></div>
+        <div class="card danger"><h4>Critical</h4><p>4</p></div>
+      </div>
+
+      <div class="chart-card">
+        <canvas id="trendChart"></canvas>
+      </div>
+
+      <div class="activity">
+        <h3>Recent Activity</h3>
+        <ul>
+          <li>✔ Audit Uploaded</li>
+          <li>⚡ AI Answer Generated</li>
+          <li>⚠ Compliance Issue Found</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- Knowledge Base -->
+    <section class="kb view" data-view="kb">
+      <div class="kb-head">
+        <div>
+          <h2>Knowledge Base</h2>
+          <p style="color:var(--muted);margin-top:6px;font-size:13px">Approved Q/A pairs used for consistent audit answers.</p>
+        </div>
+        <div class="kb-actions">
+          <button class="btn" type="button" id="kbRefreshBtn">Refresh</button>
+          <button class="btn" type="button" id="kbExportBtn">Export</button>
+          <button class="btn" type="button" id="kbImportBtn">Import</button>
+          <button class="btn primary" type="button" id="kbAddBtn">+ Add Entry</button>
+        </div>
+      </div>
+
+      <div class="kb-toolbar">
+        <input id="kbSearch" type="text" placeholder="Search knowledge base..." style="flex:1;min-width:240px" />
+        <select id="kbCategoryFilter" style="min-width:210px"></select>
+        <span id="kbCountBadge" style="color:var(--muted);font-size:12px">0 entries</span>
+        <span id="kbStatus" style="color:var(--muted);font-size:12px"></span>
+      </div>
+
+      <div class="kb-table-card">
+        <div class="kb-table-scroll">
+          <table class="kb-table" id="kbTable">
+            <thead>
+              <tr>
+                <th>Question</th>
+                <th>Answer</th>
+                <th>Category</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+
+      <input
+        id="kbImportInput"
+        type="file"
+        accept=".json,application/json,.csv,text/csv,.xlsx,.xls"
+        style="display:none"
+      />
+    </section>
+
+    <!-- Audit Upload -->
+    <section class="audit view" data-view="audit">
+      <div class="audit-head">
+        <div>
+          <h2>Security Questionnaire Automation Dashboard</h2>
+          <div class="audit-sub">Upload questionnaire · match to knowledge base · confidence scoring</div>
+        </div>
+        <div class="audit-actions">
+          <button class="btn" type="button" id="auditTemplateBtn">Download CSV Template</button>
+          <button class="btn primary" type="button" id="auditPickBtn">Upload &amp; Process</button>
+          <input id="auditFileInput" type="file" accept=".csv,text/csv,.xlsx,.xls,.docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" />
+        </div>
+      </div>
+
+      <div class="audit-grid">
+        <div class="audit-card">
+          <h3 style="font-size:14px">Upload</h3>
+          <div class="audit-tip">
+            Include a <b>Question</b> column. If missing, the first column will be used.
+            Supported: CSV, XLSX, DOCX. (PDF planned)
+          </div>
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span class="badge" id="auditSelectedFile">No file selected.</span>
+            <span class="badge" id="auditProcessStatus"></span>
+          </div>
+        </div>
+
+        <div class="audit-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+            <h3 style="font-size:14px">Recent Uploads</h3>
+            <button class="btn" type="button" id="auditClearUploadsBtn">Clear all</button>
+          </div>
+          <div class="uploads-list" id="auditUploadsList"></div>
+        </div>
+      </div>
+
+      <div class="audit-controls">
+        <div style="display:flex;align-items:center;gap:10px;min-width:320px">
+          <span class="badge" style="font-weight:700">Auto-fill threshold</span>
+          <input id="auditThreshold" type="range" min="0.50" max="0.95" step="0.01" value="0.70" style="flex:1" />
+          <span class="badge" id="auditThresholdLabel">0.70</span>
+        </div>
+        <select id="auditFilter" style="min-width:160px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#f9fafb">
+          <option value="all">All</option>
+          <option value="auto">Auto</option>
+          <option value="manual">Manual</option>
+        </select>
+        <span class="badge" id="auditCountBadge">0 rows</span>
+        <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn" type="button" id="auditFillBtn">Fill Answers</button>
+          <button class="btn primary" type="button" id="auditExportBtn">Export Filled File</button>
+        </div>
+      </div>
+
+      <div class="audit-card" id="auditEmptyState" style="display:block">
+        <div style="color:var(--muted);font-size:13px">No audit selected.</div>
+      </div>
+
+      <div class="tbl-wrap" id="auditResultsWrap" style="display:none">
+        <table class="audit-table" id="auditTable">
+          <thead>
+            <tr>
+              <th style="min-width:320px">Question</th>
+              <th style="min-width:360px">Suggested Answer</th>
+              <th style="min-width:120px">Confidence</th>
+              <th style="min-width:260px">Source Question</th>
+              <th style="min-width:110px">Status</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Chatbot -->
+    <section class="chat view" data-view="chat">
+      <div class="chat-head">
+        <div>
+          <h2>Chatbot</h2>
+          <p style="color:var(--muted);margin-top:6px;font-size:13px">KB-first assistant with backend AI fallback.</p>
+        </div>
+        <div class="chat-actions">
+          <button class="btn" type="button" id="chatClearBtn">Clear</button>
+          <button class="btn" type="button" id="chatExportBtn">Export</button>
+        </div>
+      </div>
+
+      <div class="chat-toolbar">
+        <div style="display:flex;align-items:center;gap:10px;min-width:280px">
+          <span style="font-size:12px;color:var(--muted);font-weight:600">Min confidence</span>
+          <input id="chatThreshold" type="range" min="0.60" max="0.95" step="0.01" value="0.80" style="flex:1" />
+          <span id="chatThresholdLabel" style="font-size:12px;color:var(--muted);font-weight:700;min-width:44px;text-align:right">0.80</span>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);font-weight:600;cursor:pointer">
+          <input type="checkbox" id="chatRephrase" />
+          <span>Rephrase answers</span>
+        </label>
+        <span id="chatMeta" style="flex:1;min-width:240px;font-size:12px;color:var(--muted)">No queries yet.</span>
+      </div>
+
+      <div class="chat-card">
+        <div class="chat-log" id="chatLog" aria-live="polite"></div>
+        <div class="chat-compose">
+          <textarea id="chatInput" rows="2" placeholder="Ask a security/compliance question..."></textarea>
+          <button class="btn primary" type="button" id="chatSendBtn">Send</button>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- KB Entry Modal -->
+<div class="modal-bg" id="kbEntryModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="kbModalTitle">
+    <div class="modal-head">
+      <div id="kbModalTitle" style="font-weight:700">Knowledge Base Entry</div>
+      <button class="modal-close" type="button" id="kbModalClose" aria-label="Close">&times;</button>
+    </div>
+
+    <input id="kbEntryId" type="hidden" />
+
+    <div class="form-field">
+      <label class="form-label" for="kbEntryCategory">Category</label>
+      <input class="form-input" id="kbEntryCategory" placeholder="e.g. Access Control" />
+    </div>
+    <div class="form-field">
+      <label class="form-label" for="kbEntryQuestion">Question</label>
+      <input class="form-input" id="kbEntryQuestion" placeholder="e.g. Is multi-factor authentication enabled?" />
+    </div>
+    <div class="form-field">
+      <label class="form-label" for="kbEntryAnswer">Answer</label>
+      <textarea class="form-input" id="kbEntryAnswer" rows="6" placeholder="Approved answer used verbatim."></textarea>
+    </div>
+
+    <div class="hint" id="kbEntryStatus">Question and Answer are required.</div>
+
+    <div class="modal-actions">
+      <button class="btn" type="button" id="kbCancelBtn">Cancel</button>
+      <button class="btn danger" type="button" id="kbDeleteBtn">Delete</button>
+      <button class="btn primary" type="button" id="kbSaveBtn">Save</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
