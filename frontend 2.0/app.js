@@ -108,10 +108,12 @@ let chatBusy = false;
 const AUDIT_UPLOADS_KEY = 'auditai_audit_uploads_v1';
 const AUDIT_SETTINGS_KEY = 'auditai_audit_settings_v1';
 const AUDIT_CURRENT_KEY = 'auditai_audit_current_v1';
+const AUDIT_ARCHIVE_KEY = 'auditai_audit_archive_v1';
 let auditUploads = [];
 let auditThreshold = 0.7;
 let auditFilter = 'all';
 let auditCurrent = null; // in-memory current audit session
+let auditArchive = {};
 
 let apiBase = '';
 
@@ -564,10 +566,87 @@ function loadAuditUploads() {
 
 function saveAuditUploads() {
   try {
-    localStorage.setItem(AUDIT_UPLOADS_KEY, JSON.stringify(auditUploads.slice(-30)));
+    auditUploads = auditUploads.slice(-30);
+    localStorage.setItem(AUDIT_UPLOADS_KEY, JSON.stringify(auditUploads));
   } catch {
     // ignore
   }
+  pruneAuditArchive();
+}
+
+function loadAuditArchive() {
+  try {
+    const raw = localStorage.getItem(AUDIT_ARCHIVE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function saveAuditArchive() {
+  try {
+    localStorage.setItem(AUDIT_ARCHIVE_KEY, JSON.stringify(auditArchive));
+  } catch {
+    // ignore
+  }
+}
+
+function cloneAuditAoa(aoa) {
+  if (!Array.isArray(aoa)) return null;
+  return aoa.map((row) => {
+    if (!Array.isArray(row)) return [];
+    return row.map((cell) => cell);
+  });
+}
+
+function cloneAuditResults(results) {
+  if (!Array.isArray(results)) return [];
+  return results.map((rec) => ({ ...rec }));
+}
+
+function snapshotAuditCurrent(curr) {
+  if (!curr || !curr.uploadId) return null;
+  return {
+    uploadId: curr.uploadId,
+    name: curr.name || 'audit',
+    ext: curr.ext || 'csv',
+    kind: curr.kind || 'tabular',
+    ts: curr.ts || null,
+    aoa: cloneAuditAoa(curr.aoa),
+    qIdx: typeof curr.qIdx === 'number' ? curr.qIdx : 0,
+    aIdx: typeof curr.aIdx === 'number' ? curr.aIdx : -1,
+    startRow: typeof curr.startRow === 'number' ? curr.startRow : 0,
+    results: cloneAuditResults(curr.results),
+  };
+}
+
+function updateAuditArchiveForCurrent() {
+  const snapshot = snapshotAuditCurrent(auditCurrent);
+  if (!snapshot) return;
+  auditArchive[snapshot.uploadId] = snapshot;
+  saveAuditArchive();
+}
+
+function deleteAuditArchiveEntry(id) {
+  if (!id) return;
+  if (Object.prototype.hasOwnProperty.call(auditArchive, id)) {
+    delete auditArchive[id];
+    saveAuditArchive();
+  }
+}
+
+function pruneAuditArchive() {
+  const keep = new Set(auditUploads.map((u) => String(u?.id || '')));
+  let removed = false;
+  Object.keys(auditArchive).forEach((key) => {
+    if (!keep.has(key)) {
+      delete auditArchive[key];
+      removed = true;
+    }
+  });
+  if (removed) saveAuditArchive();
 }
 
 function saveAuditCurrent() {
@@ -588,6 +667,7 @@ function saveAuditCurrent() {
       // Export after refresh will fall back to a Question/Answer CSV if aoa is not present.
     };
     localStorage.setItem(AUDIT_CURRENT_KEY, JSON.stringify(payload));
+    updateAuditArchiveForCurrent();
   } catch {
     // ignore
   }
@@ -652,18 +732,45 @@ function renderAuditUploads() {
       const name = escapeHtml(u?.name || 'file');
       const ts = escapeHtml(fmtLocalTime(u?.ts));
       const st = escapeHtml(u?.status || 'Processed');
-      return `<div class="upload-item">
+      const active = auditCurrent && String(auditCurrent.uploadId || '') === id;
+      const cls = active ? ' upload-item-active' : '';
+      const canLoad = !!auditArchive[id];
+      return `<div class="upload-item${cls}" data-upload-id="${id}">
         <div>
           <div style="font-weight:700;font-size:13px">${name}</div>
           <div class="upload-meta">${ts}</div>
         </div>
         <div class="upload-actions">
           <div class="upload-meta" style="font-weight:700">${st}</div>
+          <button class="mini-btn" type="button" data-upload-load="${id}" title="Load questions from this upload" ${canLoad ? '' : 'disabled'}>Load</button>
           <button class="upload-del" type="button" data-upload-del="${id}" title="Remove from recent uploads">Remove</button>
         </div>
       </div>`;
     })
     .join('');
+}
+
+function auditLoadUpload(uploadId) {
+  if (!uploadId) return;
+  const entry = auditArchive[String(uploadId)];
+  if (!entry || !Array.isArray(entry.results)) return;
+  auditCurrent = {
+    uploadId: entry.uploadId,
+    name: entry.name || 'audit',
+    ext: entry.ext || 'csv',
+    kind: entry.kind || 'tabular',
+    ts: entry.ts || null,
+    aoa: cloneAuditAoa(entry.aoa),
+    qIdx: typeof entry.qIdx === 'number' ? entry.qIdx : 0,
+    aIdx: typeof entry.aIdx === 'number' ? entry.aIdx : -1,
+    startRow: typeof entry.startRow === 'number' ? entry.startRow : 0,
+    results: cloneAuditResults(entry.results),
+  };
+  setAuditSelectedFile(auditCurrent.name);
+  setAuditStatus(`Loaded ${auditCurrent.results.length || 0} questions.`);
+  saveAuditCurrent();
+  renderAuditUploads();
+  renderAudit();
 }
 
 function auditDownloadTemplate() {
@@ -1327,6 +1434,8 @@ async function auditProcessFile(file) {
 function initAuditUI() {
   loadAuditSettings();
   auditUploads = loadAuditUploads();
+  auditArchive = loadAuditArchive();
+  pruneAuditArchive();
   auditCurrent = loadAuditCurrent();
   if (auditCurrent?.name) setAuditSelectedFile(auditCurrent.name);
   renderAuditUploads();
@@ -1352,6 +1461,8 @@ function initAuditUI() {
     if (!confirm('Clear upload history?')) return;
     auditUploads = [];
     auditCurrent = null;
+    auditArchive = {};
+    saveAuditArchive();
     saveAuditUploads();
     saveAuditCurrent();
     setAuditSelectedFile('No file selected.');
@@ -1386,6 +1497,11 @@ function initAuditUI() {
   document.getElementById('auditUploadsList')?.addEventListener('click', async (e) => {
     const t = e.target;
     if (!(t instanceof HTMLElement)) return;
+    const loadId = t.getAttribute('data-upload-load');
+    if (loadId) {
+      auditLoadUpload(loadId);
+      return;
+    }
     const del = t.getAttribute('data-upload-del');
     if (!del) return;
     if (!confirm('Remove this file from Recent Uploads?')) return;
@@ -1402,6 +1518,7 @@ function initAuditUI() {
       setAuditStatus('');
       renderAudit();
     }
+    deleteAuditArchiveEntry(String(del));
   });
 
   document.getElementById('auditTable')?.addEventListener('input', (e) => {
